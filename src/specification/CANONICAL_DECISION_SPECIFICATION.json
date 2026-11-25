@@ -1,0 +1,692 @@
+{
+  "metadata": {
+    "course": "AI102 — Decision Intelligence (3 SKS)",
+    "assignment": "Homework-02 — Decision Modeling with DMN",
+    "scenario": "Scenario B — Motor Insurance Underwriting (AsuransiNusantara)",
+    "dmnNamespace": "https://www.omg.org/spec/DMN/20191111/MODEL/",
+    "dmnNamespaceNote": "OMG DMN 1.3 normative URI uses https:// (verified with dmn-moddle@12.2.1; http:// fails parser check).",
+    "dmnVersion": "1.3",
+    "canonicalVersion": "1.0.0",
+    "feelEngine": {
+      "name": "feelin",
+      "version": "8.2.2"
+    },
+    "educationalDisclaimer": "All thresholds, tariff rates, and loading percentages are illustrative educational assumptions for decision modeling and are not commercial actuarial tariffs."
+  },
+  "inputs": [
+    { "id": "I01", "name": "dateOfBirth", "typeRef": "date", "nullable": true },
+    { "id": "I02", "name": "evaluationDate", "typeRef": "date", "nullable": true },
+    { "id": "I03", "name": "claimsHistoryAvailable", "typeRef": "boolean", "nullable": true },
+    { "id": "I04", "name": "claimDates", "typeRef": "tDateList", "baseType": "list<date>", "nullable": true },
+    { "id": "I05", "name": "vehicleManufactureDate", "typeRef": "date", "nullable": true },
+    { "id": "I06", "name": "vehicleType", "typeRef": "tVehicleType", "allowedValues": ["MOTORCYCLE", "CAR"], "nullable": true },
+    { "id": "I07", "name": "engineCC", "typeRef": "number", "nullable": true },
+    { "id": "I08", "name": "performanceClass", "typeRef": "tPerformanceClass", "allowedValues": ["STANDARD", "SPORT", "HIGH_PERFORMANCE"], "nullable": true },
+    { "id": "I09", "name": "coverType", "typeRef": "tCoverType", "allowedValues": ["TPO", "COMPREHENSIVE"], "nullable": true },
+    { "id": "I10", "name": "insuredValue", "typeRef": "number", "nullable": true }
+  ],
+  "bkms": [
+    {
+      "id": "BKM01",
+      "name": "calculateAgeInYears",
+      "parameters": [
+        { "name": "targetDate", "typeRef": "date" },
+        { "name": "referenceDate", "typeRef": "date" }
+      ],
+      "returnType": "number",
+      "feelBody": "if targetDate = null or referenceDate = null then null else if date(targetDate) = null or date(referenceDate) = null then null else if date(targetDate) > date(referenceDate) then -1 else years and months duration(date(targetDate), date(referenceDate)).years",
+      "knowledgeSources": ["KS01", "KS03"]
+    },
+    {
+      "id": "BKM02",
+      "name": "countRecentClaims",
+      "parameters": [
+        { "name": "claimDates", "typeRef": "tDateList" },
+        { "name": "referenceDate", "typeRef": "date" },
+        { "name": "windowMonths", "typeRef": "number" }
+      ],
+      "returnType": "number",
+      "feelBody": "if claimDates = null or referenceDate = null or windowMonths = null then null else if date(referenceDate) = null then null else count((for d in claimDates return if d = null then null else if date(d) = null then null else if date(d) >= (date(referenceDate) - duration(\"P\" + string(windowMonths) + \"M\")) and date(d) <= date(referenceDate) then d else null)[item != null])",
+      "knowledgeSources": ["KS01"]
+    }
+  ],
+  "knowledgeSources": [
+    { "id": "KS01", "name": "AsuransiNusantara Underwriting Policy (Educational)", "type": "Policy" },
+    { "id": "KS02", "name": "AsuransiNusantara Motor Tariff & Loading Schedule (Illustrative)", "type": "Tariff Schedule" },
+    { "id": "KS03", "name": "Indonesian Traffic & Licensing Law (UU No. 22/2009 — Min SIM Age 17)", "type": "Regulation" }
+  ],
+  "decisions": [
+    {
+      "id": "D01",
+      "name": "DriverRiskAssessment",
+      "label": "Driver Risk Assessment",
+      "outputName": "driverRisk",
+      "outputTypeRef": "tDriverRisk",
+      "allowedValues": ["LOW", "MEDIUM", "HIGH", "INELIGIBLE", "UNKNOWN"],
+      "hitPolicy": "UNIQUE",
+      "informationRequirements": ["I01", "I02"],
+      "knowledgeRequirements": ["BKM01"],
+      "authorityRequirements": ["KS01", "KS03"],
+      "inputs": [
+        { "id": "D01_in1", "label": "Driver Age (Years)", "expression": "calculateAgeInYears(dateOfBirth, evaluationDate)", "typeRef": "number" }
+      ],
+      "rules": [
+        { "id": "R-D01-01", "inputs": ["null"], "output": "\"UNKNOWN\"", "annotation": "Missing or malformed DOB or evaluationDate -> unknown driver risk" },
+        { "id": "R-D01-02", "inputs": ["< 0"], "output": "\"INELIGIBLE\"", "annotation": "Explicit invalid future DOB sentinel (-1) -> ineligible (never treated as valid age)" },
+        { "id": "R-D01-03", "inputs": ["[0..17)"], "output": "\"INELIGIBLE\"", "annotation": "Underage applicant (<17 Indonesian SIM A/C minimum) -> ineligible" },
+        { "id": "R-D01-04", "inputs": ["[17..24]"], "output": "\"HIGH\"", "annotation": "Young driver (17-24 inclusive) -> high risk" },
+        { "id": "R-D01-05", "inputs": ["[25..65]"], "output": "\"LOW\"", "annotation": "Prime adult driver (25-65 inclusive) -> low risk" },
+        { "id": "R-D01-06", "inputs": ["> 65"], "output": "\"MEDIUM\"", "annotation": "Senior driver (>65) -> medium risk" }
+      ]
+    },
+    {
+      "id": "D02",
+      "name": "ClaimsRiskAssessment",
+      "label": "Claims Risk Assessment",
+      "outputName": "claimsRisk",
+      "outputTypeRef": "tClaimsRisk",
+      "allowedValues": ["LOW", "MEDIUM", "HIGH", "UNKNOWN"],
+      "hitPolicy": "FIRST",
+      "informationRequirements": ["I02", "I03", "I04"],
+      "knowledgeRequirements": ["BKM02"],
+      "authorityRequirements": ["KS01"],
+      "inputs": [
+        { "id": "D02_in1", "label": "Claims History Available", "expression": "claimsHistoryAvailable", "typeRef": "boolean" },
+        { "id": "D02_in2", "label": "Recent Claims (24M)", "expression": "countRecentClaims(claimDates, evaluationDate, 24)", "typeRef": "number" }
+      ],
+      "rules": [
+        { "id": "R-D02-01", "inputs": ["not(true)", "-"], "output": "\"UNKNOWN\"", "annotation": "Missing or false claimsHistoryAvailable -> UNKNOWN (never treated as clean)" },
+        { "id": "R-D02-02", "inputs": ["true", "null"], "output": "\"UNKNOWN\"", "annotation": "Null claimDates or missing evaluationDate -> UNKNOWN" },
+        { "id": "R-D02-03", "inputs": ["true", "0"], "output": "\"LOW\"", "annotation": "Verified history with 0 claims in last 24 months" },
+        { "id": "R-D02-04", "inputs": ["true", "1"], "output": "\"MEDIUM\"", "annotation": "Verified history with 1 claim in last 24 months" },
+        { "id": "R-D02-05", "inputs": ["true", ">= 2"], "output": "\"HIGH\"", "annotation": "Verified history with >= 2 claims in last 24 months" }
+      ]
+    },
+    {
+      "id": "D03",
+      "name": "VehicleEligibilityAssessment",
+      "label": "Vehicle Eligibility Assessment",
+      "outputName": "vehicleEligibility",
+      "outputTypeRef": "tVehicleEligibility",
+      "allowedValues": ["ELIGIBLE", "INELIGIBLE"],
+      "hitPolicy": "FIRST",
+      "informationRequirements": ["I02", "I05", "I06", "I07", "I10"],
+      "knowledgeRequirements": ["BKM01"],
+      "authorityRequirements": ["KS01"],
+      "inputs": [
+        { "id": "D03_in1", "label": "Vehicle Type", "expression": "vehicleType", "typeRef": "tVehicleType" },
+        { "id": "D03_in2", "label": "Vehicle Age (Years)", "expression": "calculateAgeInYears(vehicleManufactureDate, evaluationDate)", "typeRef": "number" },
+        { "id": "D03_in3", "label": "Engine CC", "expression": "engineCC", "typeRef": "number" },
+        { "id": "D03_in4", "label": "Insured Value (IDR)", "expression": "insuredValue", "typeRef": "number" }
+      ],
+      "rules": [
+        { "id": "R-D03-01", "inputs": ["not(\"MOTORCYCLE\", \"CAR\")", "-", "-", "-"], "output": "\"INELIGIBLE\"", "annotation": "Unsupported or null vehicle type" },
+        { "id": "R-D03-02", "inputs": ["-", "null", "-", "-"], "output": "\"INELIGIBLE\"", "annotation": "Missing manufacture or evaluation date" },
+        { "id": "R-D03-03", "inputs": ["-", "< 0", "-", "-"], "output": "\"INELIGIBLE\"", "annotation": "Invalid future manufacture date" },
+        { "id": "R-D03-04", "inputs": ["-", "> 15", "-", "-"], "output": "\"INELIGIBLE\"", "annotation": "Very old vehicle (> 15 completed years)" },
+        { "id": "R-D03-05", "inputs": ["-", "-", "null, <= 0", "-"], "output": "\"INELIGIBLE\"", "annotation": "Missing or non-positive engine displacement" },
+        { "id": "R-D03-06", "inputs": ["-", "-", "-", "null, <= 0"], "output": "\"INELIGIBLE\"", "annotation": "Missing or non-positive insured value" },
+        { "id": "R-D03-07", "inputs": ["\"MOTORCYCLE\", \"CAR\"", "[0..15]", "> 0", "> 0"], "output": "\"ELIGIBLE\"", "annotation": "Valid vehicle type, age <= 15 years, positive cc and value" }
+      ]
+    },
+    {
+      "id": "D04",
+      "name": "VehicleRiskAssessment",
+      "label": "Vehicle Risk Assessment",
+      "outputName": "vehicleRisk",
+      "outputTypeRef": "tVehicleRisk",
+      "allowedValues": ["LOW", "MEDIUM", "HIGH"],
+      "hitPolicy": "FIRST",
+      "informationRequirements": ["I02", "I05", "I06", "I07", "I08"],
+      "knowledgeRequirements": ["BKM01"],
+      "authorityRequirements": ["KS01"],
+      "inputs": [
+        { "id": "D04_in1", "label": "Vehicle Type", "expression": "vehicleType", "typeRef": "tVehicleType" },
+        { "id": "D04_in2", "label": "Engine CC", "expression": "engineCC", "typeRef": "number" },
+        { "id": "D04_in3", "label": "Performance Class", "expression": "performanceClass", "typeRef": "tPerformanceClass" },
+        { "id": "D04_in4", "label": "Vehicle Age (Years)", "expression": "calculateAgeInYears(vehicleManufactureDate, evaluationDate)", "typeRef": "number" }
+      ],
+      "rules": [
+        { "id": "R-D04-00a", "inputs": ["not(\"MOTORCYCLE\", \"CAR\")", "-", "-", "-"], "output": "\"HIGH\"", "annotation": "Conservative HIGH guard for missing/invalid vehicleType" },
+        { "id": "R-D04-00b", "inputs": ["-", "null, <= 0", "-", "-"], "output": "\"HIGH\"", "annotation": "Conservative HIGH guard for missing/non-positive engineCC" },
+        { "id": "R-D04-00c", "inputs": ["-", "-", "not(\"STANDARD\", \"SPORT\", \"HIGH_PERFORMANCE\")", "-"], "output": "\"HIGH\"", "annotation": "Conservative HIGH guard for missing/invalid performanceClass" },
+        { "id": "R-D04-00d", "inputs": ["-", "-", "-", "null, < 0"], "output": "\"HIGH\"", "annotation": "Conservative HIGH guard for missing/future vehicleAge (-1)" },
+        { "id": "R-D04-01", "inputs": ["-", "-", "\"HIGH_PERFORMANCE\"", "-"], "output": "\"HIGH\"", "annotation": "High-performance classification always yields HIGH vehicle risk" },
+        { "id": "R-D04-02", "inputs": ["\"MOTORCYCLE\"", "> 250", "-", "-"], "output": "\"HIGH\"", "annotation": "Large-displacement motorcycle (> 250cc)" },
+        { "id": "R-D04-03", "inputs": ["\"CAR\"", "> 2500", "-", "-"], "output": "\"HIGH\"", "annotation": "Large-displacement car (> 2500cc)" },
+        { "id": "R-D04-04", "inputs": ["\"MOTORCYCLE\"", "(150..250]", "\"SPORT\"", "-"], "output": "\"HIGH\"", "annotation": "Mid-size sport motorcycle (>150-250cc + SPORT)" },
+        { "id": "R-D04-05", "inputs": ["\"MOTORCYCLE\"", "(150..250]", "-", "-"], "output": "\"MEDIUM\"", "annotation": "Mid-size motorcycle (150-250cc)" },
+        { "id": "R-D04-06", "inputs": ["\"CAR\"", "(1500..2500]", "-", "-"], "output": "\"MEDIUM\"", "annotation": "Mid-size car (1500-2500cc)" },
+        { "id": "R-D04-07", "inputs": ["-", "-", "\"SPORT\"", "-"], "output": "\"MEDIUM\"", "annotation": "Sport trim on compact engine" },
+        { "id": "R-D04-08", "inputs": ["-", "-", "-", "> 10"], "output": "\"MEDIUM\"", "annotation": "Aging vehicle (> 10 years)" },
+        { "id": "R-D04-09", "inputs": ["\"MOTORCYCLE\", \"CAR\"", "> 0", "\"STANDARD\"", "[0..10]"], "output": "\"LOW\"", "annotation": "Standard compact vehicle aged <= 10 years" },
+        { "id": "R-D04-10", "inputs": ["-", "-", "-", "-"], "output": "\"HIGH\"", "annotation": "Conservative fallback for missing/invalid vehicle attributes" }
+      ]
+    },
+    {
+      "id": "D05",
+      "name": "UnderwritingDecision",
+      "label": "Underwriting Decision",
+      "outputName": "underwritingDecision",
+      "outputTypeRef": "tUnderwritingDecision",
+      "allowedValues": ["ACCEPT", "REFER", "DECLINE"],
+      "hitPolicy": "FIRST",
+      "informationRequirements": ["D01", "D02", "D03", "D04"],
+      "knowledgeRequirements": [],
+      "authorityRequirements": ["KS01"],
+      "inputs": [
+        { "id": "D05_in1", "label": "Driver Risk", "expression": "driverRisk", "typeRef": "tDriverRisk" },
+        { "id": "D05_in2", "label": "Claims Risk", "expression": "claimsRisk", "typeRef": "tClaimsRisk" },
+        { "id": "D05_in3", "label": "Vehicle Eligibility", "expression": "vehicleEligibility", "typeRef": "tVehicleEligibility" },
+        { "id": "D05_in4", "label": "Vehicle Risk", "expression": "vehicleRisk", "typeRef": "tVehicleRisk" }
+      ],
+      "rules": [
+        { "id": "R-D05-01", "inputs": ["-", "-", "\"INELIGIBLE\"", "-"], "output": "\"DECLINE\"", "annotation": "Hard eligibility gate: ineligible vehicle always declined" },
+        { "id": "R-D05-02", "inputs": ["\"INELIGIBLE\"", "-", "-", "-"], "output": "\"DECLINE\"", "annotation": "Hard eligibility gate: underage/ineligible driver declined" },
+        { "id": "R-D05-03", "inputs": ["\"HIGH\"", "\"HIGH\"", "\"ELIGIBLE\"", "\"HIGH\""], "output": "\"DECLINE\"", "annotation": "Extreme compound risk (young + >=2 claims + high-risk vehicle)" },
+        { "id": "R-D05-04", "inputs": ["\"UNKNOWN\"", "-", "\"ELIGIBLE\"", "-"], "output": "\"REFER\"", "annotation": "Missing driver DOB -> refer for identity/age verification" },
+        { "id": "R-D05-05", "inputs": ["-", "\"UNKNOWN\"", "\"ELIGIBLE\"", "-"], "output": "\"REFER\"", "annotation": "Missing claims history -> refer (never auto-accept)" },
+        { "id": "R-D05-06", "inputs": ["-", "\"HIGH\"", "\"ELIGIBLE\"", "-"], "output": "\"REFER\"", "annotation": "High claims frequency (>=2 recent claims) -> senior review" },
+        { "id": "R-D05-07", "inputs": ["\"HIGH\"", "-", "\"ELIGIBLE\"", "\"HIGH\""], "output": "\"REFER\"", "annotation": "Young driver with high-risk/high-performance vehicle" },
+        { "id": "R-D05-08", "inputs": ["\"HIGH\"", "\"MEDIUM\"", "\"ELIGIBLE\"", "-"], "output": "\"REFER\"", "annotation": "Young driver with recent claim history" },
+        { "id": "R-D05-09", "inputs": ["\"LOW\", \"MEDIUM\", \"HIGH\"", "\"LOW\", \"MEDIUM\"", "\"ELIGIBLE\"", "\"LOW\", \"MEDIUM\", \"HIGH\""], "output": "\"ACCEPT\"", "annotation": "All remaining eligible, verified, acceptable risk profiles" },
+        { "id": "R-D05-10", "inputs": ["-", "-", "-", "-"], "output": "\"REFER\"", "annotation": "Defensive fallback for unexpected state" }
+      ]
+    },
+    {
+      "id": "D06",
+      "name": "InspectionDecision",
+      "label": "Inspection Decision",
+      "outputName": "inspectionDecision",
+      "outputTypeRef": "tInspectionDecision",
+      "allowedValues": ["REQUIRED", "NOT_REQUIRED", "NOT_APPLICABLE"],
+      "hitPolicy": "FIRST",
+      "informationRequirements": ["D05", "I02", "I05", "I09", "I10"],
+      "knowledgeRequirements": ["BKM01"],
+      "authorityRequirements": ["KS01"],
+      "inputs": [
+        { "id": "D06_in1", "label": "Underwriting Decision", "expression": "underwritingDecision", "typeRef": "tUnderwritingDecision" },
+        { "id": "D06_in2", "label": "Insured Value (IDR)", "expression": "insuredValue", "typeRef": "number" },
+        { "id": "D06_in3", "label": "Cover Type", "expression": "coverType", "typeRef": "tCoverType" },
+        { "id": "D06_in4", "label": "Vehicle Age (Years)", "expression": "calculateAgeInYears(vehicleManufactureDate, evaluationDate)", "typeRef": "number" }
+      ],
+      "rules": [
+        { "id": "R-D06-01", "inputs": ["\"DECLINE\"", "-", "-", "-"], "output": "\"NOT_APPLICABLE\"", "annotation": "Declined policies do not undergo inspection" },
+        { "id": "R-D06-02", "inputs": ["\"ACCEPT\", \"REFER\"", ">= 500000000", "-", "-"], "output": "\"REQUIRED\"", "annotation": "High-value vehicle (>= Rp500M) always requires physical inspection" },
+        { "id": "R-D06-03", "inputs": ["\"ACCEPT\", \"REFER\"", "-", "\"COMPREHENSIVE\"", "> 10"], "output": "\"REQUIRED\"", "annotation": "Older vehicle (>10 years) requesting Comprehensive cover requires inspection" },
+        { "id": "R-D06-04", "inputs": ["\"ACCEPT\", \"REFER\"", "< 500000000", "\"TPO\", \"COMPREHENSIVE\"", "[0..10]"], "output": "\"NOT_REQUIRED\"", "annotation": "Standard-value vehicle within normal age" },
+        { "id": "R-D06-05", "inputs": ["\"ACCEPT\", \"REFER\"", "< 500000000", "\"TPO\"", "> 10"], "output": "\"NOT_REQUIRED\"", "annotation": "Older TPO policy below Rp500M does not require own-damage inspection" },
+        { "id": "R-D06-06", "inputs": ["-", "-", "-", "-"], "output": "\"REQUIRED\"", "annotation": "Conservative fallback requiring inspection on incomplete data" }
+      ]
+    },
+    {
+      "id": "D07",
+      "name": "BasePremiumCalculation",
+      "label": "Base Premium Calculation",
+      "outputName": "basePremium",
+      "outputTypeRef": "number",
+      "hitPolicy": "FIRST",
+      "informationRequirements": ["I06", "I07", "I09", "I10"],
+      "knowledgeRequirements": [],
+      "authorityRequirements": ["KS02"],
+      "inputs": [
+        { "id": "D07_in1", "label": "Vehicle Type", "expression": "vehicleType", "typeRef": "tVehicleType" },
+        { "id": "D07_in2", "label": "Engine CC", "expression": "engineCC", "typeRef": "number" },
+        { "id": "D07_in3", "label": "Cover Type", "expression": "coverType", "typeRef": "tCoverType" },
+        { "id": "D07_in4", "label": "Insured Value (IDR)", "expression": "insuredValue", "typeRef": "number" }
+      ],
+      "rules": [
+        { "id": "R-D07-00", "inputs": ["-", "-", "-", "null, <= 0"], "output": "0", "annotation": "Guard: missing or non-positive insuredValue yields 0 (avoids floor/null error)" },
+        { "id": "R-D07-01", "inputs": ["\"MOTORCYCLE\"", "(0..150]", "\"TPO\"", "> 0"], "output": "decimal(max(150000, insuredValue * 0.005), 0)", "annotation": "MC <=150cc TPO: 0.5%, floor Rp150k" },
+        { "id": "R-D07-02", "inputs": ["\"MOTORCYCLE\"", "(0..150]", "\"COMPREHENSIVE\"", "> 0"], "output": "decimal(max(300000, insuredValue * 0.020), 0)", "annotation": "MC <=150cc Comp: 2.0%, floor Rp300k" },
+        { "id": "R-D07-03", "inputs": ["\"MOTORCYCLE\"", "(150..250]", "\"TPO\"", "> 0"], "output": "decimal(max(200000, insuredValue * 0.007), 0)", "annotation": "MC 151-250cc TPO: 0.7%, floor Rp200k" },
+        { "id": "R-D07-04", "inputs": ["\"MOTORCYCLE\"", "(150..250]", "\"COMPREHENSIVE\"", "> 0"], "output": "decimal(max(450000, insuredValue * 0.025), 0)", "annotation": "MC 151-250cc Comp: 2.5%, floor Rp450k" },
+        { "id": "R-D07-05", "inputs": ["\"MOTORCYCLE\"", "> 250", "\"TPO\"", "> 0"], "output": "decimal(max(350000, insuredValue * 0.010), 0)", "annotation": "MC >250cc TPO: 1.0%, floor Rp350k" },
+        { "id": "R-D07-06", "inputs": ["\"MOTORCYCLE\"", "> 250", "\"COMPREHENSIVE\"", "> 0"], "output": "decimal(max(750000, insuredValue * 0.032), 0)", "annotation": "MC >250cc Comp: 3.2%, floor Rp750k" },
+        { "id": "R-D07-07", "inputs": ["\"CAR\"", "(0..1500]", "\"TPO\"", "> 0"], "output": "decimal(max(500000, insuredValue * 0.004), 0)", "annotation": "Car <=1500cc TPO: 0.4%, floor Rp500k" },
+        { "id": "R-D07-08", "inputs": ["\"CAR\"", "(0..1500]", "\"COMPREHENSIVE\"", "> 0"], "output": "decimal(max(1500000, insuredValue * 0.018), 0)", "annotation": "Car <=1500cc Comp: 1.8%, floor Rp1.5M" },
+        { "id": "R-D07-09", "inputs": ["\"CAR\"", "(1500..2500]", "\"TPO\"", "> 0"], "output": "decimal(max(650000, insuredValue * 0.005), 0)", "annotation": "Car 1501-2500cc TPO: 0.5%, floor Rp650k" },
+        { "id": "R-D07-10", "inputs": ["\"CAR\"", "(1500..2500]", "\"COMPREHENSIVE\"", "> 0"], "output": "decimal(max(2000000, insuredValue * 0.022), 0)", "annotation": "Car 1501-2500cc Comp: 2.2%, floor Rp2.0M" },
+        { "id": "R-D07-11", "inputs": ["\"CAR\"", "> 2500", "\"TPO\"", "> 0"], "output": "decimal(max(850000, insuredValue * 0.006), 0)", "annotation": "Car >2500cc TPO: 0.6%, floor Rp850k" },
+        { "id": "R-D07-12", "inputs": ["\"CAR\"", "> 2500", "\"COMPREHENSIVE\"", "> 0"], "output": "decimal(max(2500000, insuredValue * 0.028), 0)", "annotation": "Car >2500cc Comp: 2.8%, floor Rp2.5M" },
+        { "id": "R-D07-13", "inputs": ["-", "-", "-", "-"], "output": "0", "annotation": "Fallback for invalid/missing vehicle, engineCC, or coverType" }
+      ]
+    },
+    {
+      "id": "D08",
+      "name": "RiskLoadingCalculation",
+      "label": "Risk Loading Calculation",
+      "outputName": "totalRiskLoading",
+      "outputTypeRef": "number",
+      "hitPolicy": "COLLECT",
+      "aggregation": "SUM",
+      "informationRequirements": ["D01", "D02", "D04", "I08"],
+      "knowledgeRequirements": [],
+      "authorityRequirements": ["KS02"],
+      "inputs": [
+        { "id": "D08_in1", "label": "Driver Risk", "expression": "driverRisk", "typeRef": "tDriverRisk" },
+        { "id": "D08_in2", "label": "Claims Risk", "expression": "claimsRisk", "typeRef": "tClaimsRisk" },
+        { "id": "D08_in3", "label": "Vehicle Risk", "expression": "vehicleRisk", "typeRef": "tVehicleRisk" },
+        { "id": "D08_in4", "label": "Performance Class", "expression": "performanceClass", "typeRef": "tPerformanceClass" }
+      ],
+      "rules": [
+        { "id": "R-D08-01", "inputs": ["\"HIGH\"", "-", "-", "-"], "output": "0.25", "annotation": "Young driver loading (+25%)" },
+        { "id": "R-D08-02", "inputs": ["\"MEDIUM\"", "-", "-", "-"], "output": "0.10", "annotation": "Senior driver loading (+10%)" },
+        { "id": "R-D08-03", "inputs": ["\"LOW\", \"INELIGIBLE\", \"UNKNOWN\"", "-", "-", "-"], "output": "0.00", "annotation": "No driver surcharge (or handled by decline/refer)" },
+        { "id": "R-D08-04", "inputs": ["-", "\"MEDIUM\"", "-", "-"], "output": "0.20", "annotation": "1 recent claim loading (+20%)" },
+        { "id": "R-D08-05", "inputs": ["-", "\"HIGH\"", "-", "-"], "output": "0.40", "annotation": "2+ recent claims loading (+40%)" },
+        { "id": "R-D08-06", "inputs": ["-", "\"UNKNOWN\"", "-", "-"], "output": "0.25", "annotation": "Missing claims history provisional loading (+25%)" },
+        { "id": "R-D08-07", "inputs": ["-", "\"LOW\"", "-", "-"], "output": "0.00", "annotation": "Clean claims record (+0%)" },
+        { "id": "R-D08-08", "inputs": ["-", "-", "\"MEDIUM\"", "-"], "output": "0.10", "annotation": "Medium vehicle technical risk loading (+10%)" },
+        { "id": "R-D08-09", "inputs": ["-", "-", "\"HIGH\"", "-"], "output": "0.20", "annotation": "High vehicle technical risk loading (+20%)" },
+        { "id": "R-D08-10", "inputs": ["-", "-", "\"LOW\"", "-"], "output": "0.00", "annotation": "Low vehicle technical risk (+0%)" },
+        { "id": "R-D08-11", "inputs": ["-", "-", "-", "\"SPORT\""], "output": "0.15", "annotation": "Sport trim surcharge (+15%)" },
+        { "id": "R-D08-12", "inputs": ["-", "-", "-", "\"HIGH_PERFORMANCE\""], "output": "0.30", "annotation": "High-performance surcharge (+30%)" },
+        { "id": "R-D08-13", "inputs": ["-", "-", "-", "\"STANDARD\""], "output": "0.00", "annotation": "Standard performance class (+0%)" },
+        { "id": "R-D08-14", "inputs": ["-", "-", "-", "not(\"STANDARD\", \"SPORT\", \"HIGH_PERFORMANCE\")"], "output": "0.30", "annotation": "Conservative fallback (+30%) for missing/invalid performance class" }
+      ]
+    },
+    {
+      "id": "D09",
+      "name": "FinalPremiumCalculation",
+      "label": "Final Premium Calculation",
+      "outputName": "finalPremium",
+      "outputTypeRef": "number",
+      "hitPolicy": "UNIQUE",
+      "informationRequirements": ["D05", "D07", "D08"],
+      "knowledgeRequirements": [],
+      "authorityRequirements": ["KS02"],
+      "inputs": [
+        { "id": "D09_in1", "label": "Underwriting Decision", "expression": "underwritingDecision", "typeRef": "tUnderwritingDecision" }
+      ],
+      "rules": [
+        { "id": "R-D09-01", "inputs": ["\"DECLINE\""], "output": "0", "annotation": "Declined risk incurs zero premium" },
+        { "id": "R-D09-02", "inputs": ["\"ACCEPT\""], "output": "decimal(basePremium * (1 + totalRiskLoading), 0)", "annotation": "Accepted policy premium with additive risk loading" },
+        { "id": "R-D09-03", "inputs": ["\"REFER\""], "output": "decimal(basePremium * (1 + totalRiskLoading), 0)", "annotation": "Provisional indicative premium pending senior underwriter review" }
+      ]
+    }
+  ],
+  "feelExpressionsCatalog": [
+    {
+      "id": "FEEL-01",
+      "category": "Range condition (interval notation)",
+      "location": "D01 (R-D01-03, R-D01-04) & D04 (R-D04-05)",
+      "expression": "driverAge in [17..24]",
+      "purpose": "Inclusive closed-interval check classifying licensed young drivers aged 17 to 24.",
+      "tests": [
+        { "name": "Lower boundary (age 17)", "context": { "driverAge": 17 }, "expected": true, "isEdgeCase": true },
+        { "name": "Upper boundary (age 24)", "context": { "driverAge": 24 }, "expected": true, "isEdgeCase": true },
+        { "name": "Outside boundary (age 25)", "context": { "driverAge": 25 }, "expected": false, "isEdgeCase": true }
+      ]
+    },
+    {
+      "id": "FEEL-02",
+      "category": "List membership condition",
+      "location": "D03 (R-D03-01) & Vehicle Risk classification",
+      "expression": "(vehicleType in [\"MOTORCYCLE\", \"CAR\"]) and (performanceClass in [\"SPORT\", \"HIGH_PERFORMANCE\"])",
+      "purpose": "Validates supported vehicle category and checks membership in sporty performance tiers.",
+      "tests": [
+        { "name": "Supported SPORT motorcycle", "context": { "vehicleType": "MOTORCYCLE", "performanceClass": "SPORT" }, "expected": true, "isEdgeCase": false },
+        { "name": "Unsupported vehicle type TRUCK", "context": { "vehicleType": "TRUCK", "performanceClass": "HIGH_PERFORMANCE" }, "expected": false, "isEdgeCase": true }
+      ]
+    },
+    {
+      "id": "FEEL-03",
+      "category": "Built-in function call",
+      "location": "D07 (Base Premium Floor) & D09 (Final Premium)",
+      "expression": "decimal(max(450000, insuredValue * 0.025) * (1 + totalRiskLoading), 0)",
+      "purpose": "Applies built-in max() for minimum tariff floor and decimal(..., 0) for IEEE-754-safe integer IDR rounding.",
+      "tests": [
+        { "name": "Low value hitting minimum floor", "context": { "insuredValue": 10000000, "totalRiskLoading": 0.35 }, "expected": 607500, "isEdgeCase": true },
+        { "name": "Standard value above floor", "context": { "insuredValue": 40000000, "totalRiskLoading": 0.35 }, "expected": 1350000, "isEdgeCase": false }
+      ]
+    },
+    {
+      "id": "FEEL-04",
+      "category": "Date/duration arithmetic",
+      "location": "BKM01 (calculateAgeInYears)",
+      "expression": "if date(targetDate) > date(referenceDate) then -1 else years and months duration(date(targetDate), date(referenceDate)).years",
+      "purpose": "Exact calendar-year age using years-and-months duration (avoiding 365.25-day leap-year drift) with future-date guard.",
+      "tests": [
+        { "name": "Exact 25th birthday (leap-year safe)", "context": { "targetDate": "2001-11-25", "referenceDate": "2026-11-25" }, "expected": 25, "isEdgeCase": true },
+        { "name": "One day before 25th birthday", "context": { "targetDate": "2001-11-26", "referenceDate": "2026-11-25" }, "expected": 24, "isEdgeCase": true },
+        { "name": "Invalid future date guard", "context": { "targetDate": "2027-01-01", "referenceDate": "2026-11-25" }, "expected": -1, "isEdgeCase": true }
+      ]
+    },
+    {
+      "id": "FEEL-05",
+      "category": "Date/duration arithmetic (Recency window)",
+      "location": "BKM02 (countRecentClaims)",
+      "expression": "count(claimDates[date(item) >= (date(referenceDate) - duration(\"P24M\")) and date(item) <= date(referenceDate)])",
+      "purpose": "Counts historical claims within an exact 24-month calendar lookback ending on evaluationDate.",
+      "tests": [
+        { "name": "Exact 24-month boundary vs 1 day older", "context": { "claimDates": ["2024-11-25", "2024-11-24"], "referenceDate": "2026-11-25" }, "expected": 1, "isEdgeCase": true },
+        { "name": "Empty verified claims list", "context": { "claimDates": [], "referenceDate": "2026-11-25" }, "expected": 0, "isEdgeCase": true }
+      ]
+    },
+    {
+      "id": "FEEL-06",
+      "category": "Compound expression (if...then...else + logical operators)",
+      "location": "D05/D06 integrated policy guard check",
+      "expression": "if vehicleEligibility = \"INELIGIBLE\" or driverRisk = \"INELIGIBLE\" then \"DECLINE\" else if claimsRisk = \"UNKNOWN\" or driverRisk = \"UNKNOWN\" or claimsRisk = \"HIGH\" or (driverRisk = \"HIGH\" and (vehicleRisk = \"HIGH\" or claimsRisk = \"MEDIUM\")) then \"REFER\" else \"ACCEPT\"",
+      "purpose": "Demonstrates hierarchical compound boolean logic enforcing DECLINE > REFER > ACCEPT.",
+      "tests": [
+        { "name": "Ineligible vehicle overrides clean driver", "context": { "vehicleEligibility": "INELIGIBLE", "driverRisk": "LOW", "claimsRisk": "LOW", "vehicleRisk": "LOW" }, "expected": "DECLINE", "isEdgeCase": true },
+        { "name": "Missing claims history forces REFER", "context": { "vehicleEligibility": "ELIGIBLE", "driverRisk": "LOW", "claimsRisk": "UNKNOWN", "vehicleRisk": "LOW" }, "expected": "REFER", "isEdgeCase": true },
+        { "name": "Clean profile accepted", "context": { "vehicleEligibility": "ELIGIBLE", "driverRisk": "LOW", "claimsRisk": "LOW", "vehicleRisk": "MEDIUM" }, "expected": "ACCEPT", "isEdgeCase": false }
+      ]
+    }
+  ],
+  "testCases": [
+    {
+      "id": "TC-01",
+      "name": "Normal Acceptance — Prime Adult Standard Car (Comprehensive)",
+      "category": "Normal Acceptance",
+      "inputs": {
+        "dateOfBirth": "1990-05-15",
+        "evaluationDate": "2026-11-25",
+        "claimsHistoryAvailable": true,
+        "claimDates": ["2023-01-10"],
+        "vehicleManufactureDate": "2022-03-01",
+        "vehicleType": "CAR",
+        "engineCC": 1496,
+        "performanceClass": "STANDARD",
+        "coverType": "COMPREHENSIVE",
+        "insuredValue": 250000000
+      },
+      "expected": {
+        "driverAge": 36,
+        "recentClaimsCount": 0,
+        "vehicleAge": 4,
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 4500000,
+        "totalRiskLoading": 0.0,
+        "finalPremium": 4500000
+      }
+    },
+    {
+      "id": "TC-02",
+      "name": "Borderline Thresholds — Age 24 (1 Day Before 25), Vehicle Age 15, 250cc Motorcycle",
+      "category": "Borderline Case",
+      "inputs": {
+        "dateOfBirth": "2001-11-26",
+        "evaluationDate": "2026-11-25",
+        "claimsHistoryAvailable": true,
+        "claimDates": [],
+        "vehicleManufactureDate": "2011-11-25",
+        "vehicleType": "MOTORCYCLE",
+        "engineCC": 250,
+        "performanceClass": "STANDARD",
+        "coverType": "COMPREHENSIVE",
+        "insuredValue": 40000000
+      },
+      "expected": {
+        "driverAge": 24,
+        "recentClaimsCount": 0,
+        "vehicleAge": 15,
+        "driverRisk": "HIGH",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "MEDIUM",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "REQUIRED",
+        "basePremium": 1000000,
+        "totalRiskLoading": 0.35,
+        "finalPremium": 1350000
+      }
+    },
+    {
+      "id": "TC-03",
+      "name": "High Risk Referral — Young Driver + 1 Recent Claim + 600cc High-Performance Motorcycle",
+      "category": "High Risk (Refer)",
+      "inputs": {
+        "dateOfBirth": "2004-06-10",
+        "evaluationDate": "2026-11-25",
+        "claimsHistoryAvailable": true,
+        "claimDates": ["2026-03-15"],
+        "vehicleManufactureDate": "2024-01-15",
+        "vehicleType": "MOTORCYCLE",
+        "engineCC": 600,
+        "performanceClass": "HIGH_PERFORMANCE",
+        "coverType": "COMPREHENSIVE",
+        "insuredValue": 350000000
+      },
+      "expected": {
+        "driverAge": 22,
+        "recentClaimsCount": 1,
+        "vehicleAge": 2,
+        "driverRisk": "HIGH",
+        "claimsRisk": "MEDIUM",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "HIGH",
+        "underwritingDecision": "REFER",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 11200000,
+        "totalRiskLoading": 0.95,
+        "finalPremium": 21840000
+      }
+    },
+    {
+      "id": "TC-04",
+      "name": "Decline — Very Old Vehicle (16 Years > 15-Year Maximum)",
+      "category": "Decline (Age)",
+      "inputs": {
+        "dateOfBirth": "1985-08-20",
+        "evaluationDate": "2026-11-25",
+        "claimsHistoryAvailable": true,
+        "claimDates": [],
+        "vehicleManufactureDate": "2010-11-25",
+        "vehicleType": "CAR",
+        "engineCC": 1500,
+        "performanceClass": "STANDARD",
+        "coverType": "TPO",
+        "insuredValue": 80000000
+      },
+      "expected": {
+        "driverAge": 41,
+        "recentClaimsCount": 0,
+        "vehicleAge": 16,
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "INELIGIBLE",
+        "vehicleRisk": "MEDIUM",
+        "underwritingDecision": "DECLINE",
+        "inspectionDecision": "NOT_APPLICABLE",
+        "basePremium": 500000,
+        "totalRiskLoading": 0.1,
+        "finalPremium": 0
+      }
+    },
+    {
+      "id": "TC-05",
+      "name": "Edge Case — Missing Claims History + High-Value TPO (Rp550M)",
+      "category": "Missing Data Edge Case",
+      "inputs": {
+        "dateOfBirth": "1988-02-10",
+        "evaluationDate": "2026-11-25",
+        "claimsHistoryAvailable": false,
+        "claimDates": [],
+        "vehicleManufactureDate": "2024-01-10",
+        "vehicleType": "CAR",
+        "engineCC": 2000,
+        "performanceClass": "STANDARD",
+        "coverType": "TPO",
+        "insuredValue": 550000000
+      },
+      "expected": {
+        "driverAge": 38,
+        "recentClaimsCount": 0,
+        "vehicleAge": 2,
+        "driverRisk": "LOW",
+        "claimsRisk": "UNKNOWN",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "MEDIUM",
+        "underwritingDecision": "REFER",
+        "inspectionDecision": "REQUIRED",
+        "basePremium": 2750000,
+        "totalRiskLoading": 0.35,
+        "finalPremium": 3712500
+      }
+    },
+    {
+      "id": "TC-06",
+      "name": "Edge Case — Exact Inspection Value Threshold (Rp500M) + 2500cc Sport Car",
+      "category": "Boundary Edge Case",
+      "inputs": {
+        "dateOfBirth": "1992-07-01",
+        "evaluationDate": "2026-11-25",
+        "claimsHistoryAvailable": true,
+        "claimDates": [],
+        "vehicleManufactureDate": "2025-01-01",
+        "vehicleType": "CAR",
+        "engineCC": 2500,
+        "performanceClass": "SPORT",
+        "coverType": "COMPREHENSIVE",
+        "insuredValue": 500000000
+      },
+      "expected": {
+        "driverAge": 34,
+        "recentClaimsCount": 0,
+        "vehicleAge": 1,
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "MEDIUM",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "REQUIRED",
+        "basePremium": 11000000,
+        "totalRiskLoading": 0.25,
+        "finalPremium": 13750000
+      }
+    },
+    {
+      "id": "TC-07",
+      "name": "Edge Case — Exact 24-Month Claim Boundary + Senior Driver + 150cc MC TPO Floor",
+      "category": "Boundary Edge Case",
+      "inputs": {
+        "dateOfBirth": "1959-10-01",
+        "evaluationDate": "2026-11-25",
+        "claimsHistoryAvailable": true,
+        "claimDates": ["2024-11-25", "2024-11-24"],
+        "vehicleManufactureDate": "2023-05-01",
+        "vehicleType": "MOTORCYCLE",
+        "engineCC": 150,
+        "performanceClass": "STANDARD",
+        "coverType": "TPO",
+        "insuredValue": 25000000
+      },
+      "expected": {
+        "driverAge": 67,
+        "recentClaimsCount": 1,
+        "vehicleAge": 3,
+        "driverRisk": "MEDIUM",
+        "claimsRisk": "MEDIUM",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 150000,
+        "totalRiskLoading": 0.3,
+        "finalPremium": 195000
+      }
+    },
+    {
+      "id": "TC-08",
+      "name": "Compound Extreme Risk Decline — Young + 2 Recent Claims + 251cc Sport Motorcycle",
+      "category": "Decline (Compound Risk)",
+      "inputs": {
+        "dateOfBirth": "2005-01-10",
+        "evaluationDate": "2026-11-25",
+        "claimsHistoryAvailable": true,
+        "claimDates": ["2025-08-01", "2026-04-12"],
+        "vehicleManufactureDate": "2024-06-01",
+        "vehicleType": "MOTORCYCLE",
+        "engineCC": 251,
+        "performanceClass": "SPORT",
+        "coverType": "COMPREHENSIVE",
+        "insuredValue": 120000000
+      },
+      "expected": {
+        "driverAge": 21,
+        "recentClaimsCount": 2,
+        "vehicleAge": 2,
+        "driverRisk": "HIGH",
+        "claimsRisk": "HIGH",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "HIGH",
+        "underwritingDecision": "DECLINE",
+        "inspectionDecision": "NOT_APPLICABLE",
+        "basePremium": 3840000,
+        "totalRiskLoading": 1.0,
+        "finalPremium": 0
+      }
+    },
+    {
+      "id": "TC-09",
+      "name": "Edge Case — Underage Driver (Age 16 < 17 Minimum SIM Age)",
+      "category": "Decline (Underage)",
+      "inputs": {
+        "dateOfBirth": "2010-03-01",
+        "evaluationDate": "2026-11-25",
+        "claimsHistoryAvailable": true,
+        "claimDates": [],
+        "vehicleManufactureDate": "2024-01-01",
+        "vehicleType": "MOTORCYCLE",
+        "engineCC": 125,
+        "performanceClass": "STANDARD",
+        "coverType": "TPO",
+        "insuredValue": 20000000
+      },
+      "expected": {
+        "driverAge": 16,
+        "recentClaimsCount": 0,
+        "vehicleAge": 2,
+        "driverRisk": "INELIGIBLE",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "DECLINE",
+        "inspectionDecision": "NOT_APPLICABLE",
+        "basePremium": 150000,
+        "totalRiskLoading": 0.0,
+        "finalPremium": 0
+      }
+    },
+    {
+      "id": "TC-10",
+      "name": "Edge Case — Missing Date of Birth (Null DOB -> Refer)",
+      "category": "Missing Data Edge Case",
+      "inputs": {
+        "dateOfBirth": null,
+        "evaluationDate": "2026-11-25",
+        "claimsHistoryAvailable": true,
+        "claimDates": [],
+        "vehicleManufactureDate": "2024-01-01",
+        "vehicleType": "CAR",
+        "engineCC": 1500,
+        "performanceClass": "STANDARD",
+        "coverType": "COMPREHENSIVE",
+        "insuredValue": 200000000
+      },
+      "expected": {
+        "driverAge": null,
+        "recentClaimsCount": 0,
+        "vehicleAge": 2,
+        "driverRisk": "UNKNOWN",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "REFER",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 3600000,
+        "totalRiskLoading": 0.0,
+        "finalPremium": 3600000
+      }
+    }
+  ]
+}

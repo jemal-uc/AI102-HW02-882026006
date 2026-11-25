@@ -1,0 +1,2814 @@
+{
+  "executedAt": "2026-11-25T16:03:04.188Z",
+  "dynamicTopologicalOrder": [
+    "D01",
+    "D02",
+    "D03",
+    "D04",
+    "D07",
+    "D05",
+    "D08",
+    "D06",
+    "D09"
+  ],
+  "boundBkmFunctions": [
+    "calculateAgeInYears",
+    "countRecentClaims"
+  ],
+  "dmnModdleWarnings": 0,
+  "totalCases": 18,
+  "passedCases": 18,
+  "failedCases": 0,
+  "cases": [
+    {
+      "id": "TC-01",
+      "name": "Normal Acceptance — Prime Adult Standard Car (Comprehensive)",
+      "category": "Normal Acceptance",
+      "actual": {
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 4500000,
+        "totalRiskLoading": 0,
+        "finalPremium": 4500000
+      },
+      "refArith": {
+        "base": 4500000,
+        "loading": 0,
+        "finalPrem": 4500000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            36
+          ],
+          "matchedRuleIds": [
+            "R-D01-05"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "LOW"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            4,
+            1496,
+            250000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1496,
+            "STANDARD",
+            4
+          ],
+          "matchedRuleIds": [
+            "R-D04-09"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "LOW"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1496,
+            "COMPREHENSIVE",
+            250000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-08"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 4500000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "ELIGIBLE",
+            "LOW"
+          ],
+          "matchedRuleIds": [
+            "R-D05-09"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "ACCEPT"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "LOW",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-10",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "ACCEPT",
+            250000000,
+            "COMPREHENSIVE",
+            4
+          ],
+          "matchedRuleIds": [
+            "R-D06-04"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "ACCEPT"
+          ],
+          "matchedRuleIds": [
+            "R-D09-02"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 4500000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-02",
+      "name": "Borderline Thresholds — Age 24 (1 Day Before 25), Vehicle Age 15, 250cc Motorcycle",
+      "category": "Borderline Case",
+      "actual": {
+        "driverRisk": "HIGH",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "MEDIUM",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "REQUIRED",
+        "basePremium": 1000000,
+        "totalRiskLoading": 0.35,
+        "finalPremium": 1350000
+      },
+      "refArith": {
+        "base": 1000000,
+        "loading": 0.35,
+        "finalPrem": 1350000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            24
+          ],
+          "matchedRuleIds": [
+            "R-D01-04"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "HIGH"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            15,
+            250,
+            40000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            250,
+            "STANDARD",
+            15
+          ],
+          "matchedRuleIds": [
+            "R-D04-05"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "MEDIUM"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            250,
+            "COMPREHENSIVE",
+            40000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-04"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 1000000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "HIGH",
+            "LOW",
+            "ELIGIBLE",
+            "MEDIUM"
+          ],
+          "matchedRuleIds": [
+            "R-D05-09"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "ACCEPT"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "HIGH",
+            "LOW",
+            "MEDIUM",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-01",
+            "R-D08-07",
+            "R-D08-08",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.35
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "ACCEPT",
+            40000000,
+            "COMPREHENSIVE",
+            15
+          ],
+          "matchedRuleIds": [
+            "R-D06-03"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "ACCEPT"
+          ],
+          "matchedRuleIds": [
+            "R-D09-02"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 1350000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-03",
+      "name": "High Risk Referral — Young Driver + 1 Recent Claim + 600cc High-Performance Motorcycle",
+      "category": "High Risk (Refer)",
+      "actual": {
+        "driverRisk": "HIGH",
+        "claimsRisk": "MEDIUM",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "HIGH",
+        "underwritingDecision": "REFER",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 11200000,
+        "totalRiskLoading": 0.95,
+        "finalPremium": 21840000
+      },
+      "refArith": {
+        "base": 11200000,
+        "loading": 0.95,
+        "finalPrem": 21840000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            22
+          ],
+          "matchedRuleIds": [
+            "R-D01-04"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "HIGH"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            1
+          ],
+          "matchedRuleIds": [
+            "R-D02-04"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "MEDIUM"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            2,
+            600,
+            350000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            600,
+            "HIGH_PERFORMANCE",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-01"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "HIGH"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            600,
+            "COMPREHENSIVE",
+            350000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-06"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 11200000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "HIGH",
+            "MEDIUM",
+            "ELIGIBLE",
+            "HIGH"
+          ],
+          "matchedRuleIds": [
+            "R-D05-07"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "REFER"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "HIGH",
+            "MEDIUM",
+            "HIGH",
+            "HIGH_PERFORMANCE"
+          ],
+          "matchedRuleIds": [
+            "R-D08-01",
+            "R-D08-04",
+            "R-D08-09",
+            "R-D08-12"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.95
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "REFER",
+            350000000,
+            "COMPREHENSIVE",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-04"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "REFER"
+          ],
+          "matchedRuleIds": [
+            "R-D09-03"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 21840000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-04",
+      "name": "Decline — Very Old Vehicle (16 Years > 15-Year Maximum)",
+      "category": "Decline (Age)",
+      "actual": {
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "INELIGIBLE",
+        "vehicleRisk": "MEDIUM",
+        "underwritingDecision": "DECLINE",
+        "inspectionDecision": "NOT_APPLICABLE",
+        "basePremium": 500000,
+        "totalRiskLoading": 0.1,
+        "finalPremium": 0
+      },
+      "refArith": {
+        "base": 500000,
+        "loading": 0.1,
+        "finalPrem": 0
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            41
+          ],
+          "matchedRuleIds": [
+            "R-D01-05"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "LOW"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            16,
+            1500,
+            80000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-04"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "INELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "STANDARD",
+            16
+          ],
+          "matchedRuleIds": [
+            "R-D04-08"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "MEDIUM"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "TPO",
+            80000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-07"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 500000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "INELIGIBLE",
+            "MEDIUM"
+          ],
+          "matchedRuleIds": [
+            "R-D05-01"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "DECLINE"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "MEDIUM",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-08",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.1
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "DECLINE",
+            80000000,
+            "TPO",
+            16
+          ],
+          "matchedRuleIds": [
+            "R-D06-01"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_APPLICABLE"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "DECLINE"
+          ],
+          "matchedRuleIds": [
+            "R-D09-01"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 0
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-05",
+      "name": "Edge Case — Missing Claims History + High-Value TPO (Rp550M)",
+      "category": "Missing Data Edge Case",
+      "actual": {
+        "driverRisk": "LOW",
+        "claimsRisk": "UNKNOWN",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "MEDIUM",
+        "underwritingDecision": "REFER",
+        "inspectionDecision": "REQUIRED",
+        "basePremium": 2750000,
+        "totalRiskLoading": 0.35,
+        "finalPremium": 3712500
+      },
+      "refArith": {
+        "base": 2750000,
+        "loading": 0.35,
+        "finalPrem": 3712500
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            38
+          ],
+          "matchedRuleIds": [
+            "R-D01-05"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "LOW"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            false,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-01"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "UNKNOWN"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2,
+            2000,
+            550000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2000,
+            "STANDARD",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-06"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "MEDIUM"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2000,
+            "TPO",
+            550000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-09"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 2750000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "LOW",
+            "UNKNOWN",
+            "ELIGIBLE",
+            "MEDIUM"
+          ],
+          "matchedRuleIds": [
+            "R-D05-05"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "REFER"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "LOW",
+            "UNKNOWN",
+            "MEDIUM",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-06",
+            "R-D08-08",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.35
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "REFER",
+            550000000,
+            "TPO",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-02"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "REFER"
+          ],
+          "matchedRuleIds": [
+            "R-D09-03"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 3712500
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-06",
+      "name": "Edge Case — Exact Inspection Value Threshold (Rp500M) + 2500cc Sport Car",
+      "category": "Boundary Edge Case",
+      "actual": {
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "MEDIUM",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "REQUIRED",
+        "basePremium": 11000000,
+        "totalRiskLoading": 0.25,
+        "finalPremium": 13750000
+      },
+      "refArith": {
+        "base": 11000000,
+        "loading": 0.25,
+        "finalPrem": 13750000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            34
+          ],
+          "matchedRuleIds": [
+            "R-D01-05"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "LOW"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1,
+            2500,
+            500000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2500,
+            "SPORT",
+            1
+          ],
+          "matchedRuleIds": [
+            "R-D04-06"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "MEDIUM"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2500,
+            "COMPREHENSIVE",
+            500000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-10"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 11000000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "ELIGIBLE",
+            "MEDIUM"
+          ],
+          "matchedRuleIds": [
+            "R-D05-09"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "ACCEPT"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "MEDIUM",
+            "SPORT"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-08",
+            "R-D08-11"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.25
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "ACCEPT",
+            500000000,
+            "COMPREHENSIVE",
+            1
+          ],
+          "matchedRuleIds": [
+            "R-D06-02"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "ACCEPT"
+          ],
+          "matchedRuleIds": [
+            "R-D09-02"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 13750000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-07",
+      "name": "Edge Case — Exact 24-Month Claim Boundary + Senior Driver + 150cc MC TPO Floor",
+      "category": "Boundary Edge Case",
+      "actual": {
+        "driverRisk": "MEDIUM",
+        "claimsRisk": "MEDIUM",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 150000,
+        "totalRiskLoading": 0.3,
+        "finalPremium": 195000
+      },
+      "refArith": {
+        "base": 150000,
+        "loading": 0.3,
+        "finalPrem": 195000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            67
+          ],
+          "matchedRuleIds": [
+            "R-D01-06"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "MEDIUM"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            1
+          ],
+          "matchedRuleIds": [
+            "R-D02-04"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "MEDIUM"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            3,
+            150,
+            25000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            150,
+            "STANDARD",
+            3
+          ],
+          "matchedRuleIds": [
+            "R-D04-09"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "LOW"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            150,
+            "TPO",
+            25000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-01"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 150000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MEDIUM",
+            "MEDIUM",
+            "ELIGIBLE",
+            "LOW"
+          ],
+          "matchedRuleIds": [
+            "R-D05-09"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "ACCEPT"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "MEDIUM",
+            "MEDIUM",
+            "LOW",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-02",
+            "R-D08-04",
+            "R-D08-10",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.3
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "ACCEPT",
+            25000000,
+            "TPO",
+            3
+          ],
+          "matchedRuleIds": [
+            "R-D06-04"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "ACCEPT"
+          ],
+          "matchedRuleIds": [
+            "R-D09-02"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 195000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-08",
+      "name": "Compound Extreme Risk Decline — Young + 2 Recent Claims + 251cc Sport Motorcycle",
+      "category": "Decline (Compound Risk)",
+      "actual": {
+        "driverRisk": "HIGH",
+        "claimsRisk": "HIGH",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "HIGH",
+        "underwritingDecision": "DECLINE",
+        "inspectionDecision": "NOT_APPLICABLE",
+        "basePremium": 3840000,
+        "totalRiskLoading": 1,
+        "finalPremium": 0
+      },
+      "refArith": {
+        "base": 3840000,
+        "loading": 1,
+        "finalPrem": 0
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            21
+          ],
+          "matchedRuleIds": [
+            "R-D01-04"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "HIGH"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D02-05"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "HIGH"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            2,
+            251,
+            120000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            251,
+            "SPORT",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-02"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "HIGH"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            251,
+            "COMPREHENSIVE",
+            120000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-06"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 3840000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "HIGH",
+            "HIGH",
+            "ELIGIBLE",
+            "HIGH"
+          ],
+          "matchedRuleIds": [
+            "R-D05-03"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "DECLINE"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "HIGH",
+            "HIGH",
+            "HIGH",
+            "SPORT"
+          ],
+          "matchedRuleIds": [
+            "R-D08-01",
+            "R-D08-05",
+            "R-D08-09",
+            "R-D08-11"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 1
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "DECLINE",
+            120000000,
+            "COMPREHENSIVE",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-01"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_APPLICABLE"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "DECLINE"
+          ],
+          "matchedRuleIds": [
+            "R-D09-01"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 0
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-09",
+      "name": "Edge Case — Underage Driver (Age 16 < 17 Minimum SIM Age)",
+      "category": "Decline (Underage)",
+      "actual": {
+        "driverRisk": "INELIGIBLE",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "DECLINE",
+        "inspectionDecision": "NOT_APPLICABLE",
+        "basePremium": 150000,
+        "totalRiskLoading": 0,
+        "finalPremium": 0
+      },
+      "refArith": {
+        "base": 150000,
+        "loading": 0,
+        "finalPrem": 0
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            16
+          ],
+          "matchedRuleIds": [
+            "R-D01-03"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "INELIGIBLE"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            2,
+            125,
+            20000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            125,
+            "STANDARD",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-09"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "LOW"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            125,
+            "TPO",
+            20000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-01"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 150000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "INELIGIBLE",
+            "LOW",
+            "ELIGIBLE",
+            "LOW"
+          ],
+          "matchedRuleIds": [
+            "R-D05-02"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "DECLINE"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "INELIGIBLE",
+            "LOW",
+            "LOW",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-10",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "DECLINE",
+            20000000,
+            "TPO",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-01"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_APPLICABLE"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "DECLINE"
+          ],
+          "matchedRuleIds": [
+            "R-D09-01"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 0
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-10",
+      "name": "Edge Case — Missing Date of Birth (Null DOB -> Refer)",
+      "category": "Missing Data Edge Case",
+      "actual": {
+        "driverRisk": "UNKNOWN",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "REFER",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 3600000,
+        "totalRiskLoading": 0,
+        "finalPremium": 3600000
+      },
+      "refArith": {
+        "base": 3600000,
+        "loading": 0,
+        "finalPrem": 3600000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            null
+          ],
+          "matchedRuleIds": [
+            "R-D01-01"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "UNKNOWN"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2,
+            1500,
+            200000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "STANDARD",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-09"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "LOW"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "COMPREHENSIVE",
+            200000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-08"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 3600000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "UNKNOWN",
+            "LOW",
+            "ELIGIBLE",
+            "LOW"
+          ],
+          "matchedRuleIds": [
+            "R-D05-04"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "REFER"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "UNKNOWN",
+            "LOW",
+            "LOW",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-10",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "REFER",
+            200000000,
+            "COMPREHENSIVE",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-04"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "REFER"
+          ],
+          "matchedRuleIds": [
+            "R-D09-03"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 3600000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-11",
+      "name": "Audit Edge — Future dateOfBirth (2027-01-01 -> -1 Sentinel -> Explicit Decline)",
+      "category": "Audit Adversarial",
+      "actual": {
+        "driverRisk": "INELIGIBLE",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "DECLINE",
+        "inspectionDecision": "NOT_APPLICABLE",
+        "basePremium": 3600000,
+        "totalRiskLoading": 0,
+        "finalPremium": 0
+      },
+      "refArith": {
+        "base": 3600000,
+        "loading": 0,
+        "finalPrem": 0
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            -1
+          ],
+          "matchedRuleIds": [
+            "R-D01-02"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "INELIGIBLE"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2,
+            1500,
+            200000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "STANDARD",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-09"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "LOW"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "COMPREHENSIVE",
+            200000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-08"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 3600000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "INELIGIBLE",
+            "LOW",
+            "ELIGIBLE",
+            "LOW"
+          ],
+          "matchedRuleIds": [
+            "R-D05-02"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "DECLINE"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "INELIGIBLE",
+            "LOW",
+            "LOW",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-10",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "DECLINE",
+            200000000,
+            "COMPREHENSIVE",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-01"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_APPLICABLE"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "DECLINE"
+          ],
+          "matchedRuleIds": [
+            "R-D09-01"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 0
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-12",
+      "name": "Audit Edge — Future vehicleManufactureDate (2027-06-01 -> -1 -> Decline)",
+      "category": "Audit Adversarial",
+      "actual": {
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "INELIGIBLE",
+        "vehicleRisk": "HIGH",
+        "underwritingDecision": "DECLINE",
+        "inspectionDecision": "NOT_APPLICABLE",
+        "basePremium": 600000,
+        "totalRiskLoading": 0.2,
+        "finalPremium": 0
+      },
+      "refArith": {
+        "base": 600000,
+        "loading": 0.2,
+        "finalPrem": 0
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            36
+          ],
+          "matchedRuleIds": [
+            "R-D01-05"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "LOW"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            -1,
+            1500,
+            150000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-03"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "INELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "STANDARD",
+            -1
+          ],
+          "matchedRuleIds": [
+            "R-D04-00d"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "HIGH"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "TPO",
+            150000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-07"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 600000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "INELIGIBLE",
+            "HIGH"
+          ],
+          "matchedRuleIds": [
+            "R-D05-01"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "DECLINE"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "HIGH",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-09",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.2
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "DECLINE",
+            150000000,
+            "TPO",
+            -1
+          ],
+          "matchedRuleIds": [
+            "R-D06-01"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_APPLICABLE"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "DECLINE"
+          ],
+          "matchedRuleIds": [
+            "R-D09-01"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 0
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-13",
+      "name": "Audit Edge — Zero/Null insuredValue Guard (D07 returns 0 with 0 warnings)",
+      "category": "Audit Adversarial",
+      "actual": {
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "INELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "DECLINE",
+        "inspectionDecision": "NOT_APPLICABLE",
+        "basePremium": 0,
+        "totalRiskLoading": 0,
+        "finalPremium": 0
+      },
+      "refArith": {
+        "base": 0,
+        "loading": 0,
+        "finalPrem": 0
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            36
+          ],
+          "matchedRuleIds": [
+            "R-D01-05"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "LOW"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2,
+            1500,
+            null
+          ],
+          "matchedRuleIds": [
+            "R-D03-06"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "INELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "STANDARD",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-09"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "LOW"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "TPO",
+            null
+          ],
+          "matchedRuleIds": [
+            "R-D07-00"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 0
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "INELIGIBLE",
+            "LOW"
+          ],
+          "matchedRuleIds": [
+            "R-D05-01"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "DECLINE"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "LOW",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-10",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "DECLINE",
+            null,
+            "TPO",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-01"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_APPLICABLE"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "DECLINE"
+          ],
+          "matchedRuleIds": [
+            "R-D09-01"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 0
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-14",
+      "name": "Audit Edge — Missing performanceClass (null -> Conservative HIGH +50% Loading)",
+      "category": "Audit Adversarial",
+      "actual": {
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "HIGH",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 8800000,
+        "totalRiskLoading": 0.5,
+        "finalPremium": 13200000
+      },
+      "refArith": {
+        "base": 8800000,
+        "loading": 0.5,
+        "finalPrem": 13200000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            36
+          ],
+          "matchedRuleIds": [
+            "R-D01-05"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "LOW"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2,
+            2000,
+            400000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2000,
+            null,
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-00c"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "HIGH"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2000,
+            "COMPREHENSIVE",
+            400000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-10"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 8800000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "ELIGIBLE",
+            "HIGH"
+          ],
+          "matchedRuleIds": [
+            "R-D05-09"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "ACCEPT"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "HIGH",
+            null
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-09",
+            "R-D08-14"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.5
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "ACCEPT",
+            400000000,
+            "COMPREHENSIVE",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-04"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "ACCEPT"
+          ],
+          "matchedRuleIds": [
+            "R-D09-02"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 13200000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-15",
+      "name": "Audit Edge — Claim 1 Day Outside 24M Window (2024-11-24 only -> LOW)",
+      "category": "Audit Adversarial",
+      "actual": {
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 150000,
+        "totalRiskLoading": 0,
+        "finalPremium": 150000
+      },
+      "refArith": {
+        "base": 150000,
+        "loading": 0,
+        "finalPrem": 150000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            36
+          ],
+          "matchedRuleIds": [
+            "R-D01-05"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "LOW"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            2,
+            150,
+            20000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            150,
+            "STANDARD",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-09"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "LOW"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            150,
+            "TPO",
+            20000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-01"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 150000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "ELIGIBLE",
+            "LOW"
+          ],
+          "matchedRuleIds": [
+            "R-D05-09"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "ACCEPT"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "LOW",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-10",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "ACCEPT",
+            20000000,
+            "TPO",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-04"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "ACCEPT"
+          ],
+          "matchedRuleIds": [
+            "R-D09-02"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 150000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-16",
+      "name": "Audit Edge — Null Item Inside claimDates + 1 Valid Claim (0 FEEL Warnings)",
+      "category": "Audit Adversarial",
+      "actual": {
+        "driverRisk": "LOW",
+        "claimsRisk": "MEDIUM",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 400000,
+        "totalRiskLoading": 0.2,
+        "finalPremium": 480000
+      },
+      "refArith": {
+        "base": 400000,
+        "loading": 0.2,
+        "finalPrem": 480000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            36
+          ],
+          "matchedRuleIds": [
+            "R-D01-05"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "LOW"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            1
+          ],
+          "matchedRuleIds": [
+            "R-D02-04"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "MEDIUM"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            2,
+            150,
+            20000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            150,
+            "STANDARD",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-09"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "LOW"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            150,
+            "COMPREHENSIVE",
+            20000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-02"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 400000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "LOW",
+            "MEDIUM",
+            "ELIGIBLE",
+            "LOW"
+          ],
+          "matchedRuleIds": [
+            "R-D05-09"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "ACCEPT"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "LOW",
+            "MEDIUM",
+            "LOW",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-04",
+            "R-D08-10",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.2
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "ACCEPT",
+            20000000,
+            "COMPREHENSIVE",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-04"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "ACCEPT"
+          ],
+          "matchedRuleIds": [
+            "R-D09-02"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 480000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-17",
+      "name": "Audit Edge — Driver Age Exact Lower/Upper Bounds (Age 17 -> HIGH, Age 65 check)",
+      "category": "Audit Adversarial",
+      "actual": {
+        "driverRisk": "HIGH",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "LOW",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 3600000,
+        "totalRiskLoading": 0.25,
+        "finalPremium": 4500000
+      },
+      "refArith": {
+        "base": 3600000,
+        "loading": 0.25,
+        "finalPrem": 4500000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            17
+          ],
+          "matchedRuleIds": [
+            "R-D01-04"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "HIGH"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            2,
+            1500,
+            200000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "STANDARD",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-09"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "LOW"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "CAR",
+            1500,
+            "COMPREHENSIVE",
+            200000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-08"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 3600000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "HIGH",
+            "LOW",
+            "ELIGIBLE",
+            "LOW"
+          ],
+          "matchedRuleIds": [
+            "R-D05-09"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "ACCEPT"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "HIGH",
+            "LOW",
+            "LOW",
+            "STANDARD"
+          ],
+          "matchedRuleIds": [
+            "R-D08-01",
+            "R-D08-07",
+            "R-D08-10",
+            "R-D08-13"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.25
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "ACCEPT",
+            200000000,
+            "COMPREHENSIVE",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-04"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "ACCEPT"
+          ],
+          "matchedRuleIds": [
+            "R-D09-02"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 4500000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    },
+    {
+      "id": "TC-18",
+      "name": "Audit Edge — 151cc SPORT Motorcycle (R-D04-04 HIGH) + Car >2500cc TPO",
+      "category": "Audit Adversarial",
+      "actual": {
+        "driverRisk": "LOW",
+        "claimsRisk": "LOW",
+        "vehicleEligibility": "ELIGIBLE",
+        "vehicleRisk": "HIGH",
+        "underwritingDecision": "ACCEPT",
+        "inspectionDecision": "NOT_REQUIRED",
+        "basePremium": 1500000,
+        "totalRiskLoading": 0.35,
+        "finalPremium": 2025000
+      },
+      "refArith": {
+        "base": 1500000,
+        "loading": 0.35,
+        "finalPrem": 2025000
+      },
+      "trace": {
+        "D01": {
+          "decisionId": "D01",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            41
+          ],
+          "matchedRuleIds": [
+            "R-D01-05"
+          ],
+          "outputName": "driverRisk",
+          "outputValue": "LOW"
+        },
+        "D02": {
+          "decisionId": "D02",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            true,
+            0
+          ],
+          "matchedRuleIds": [
+            "R-D02-03"
+          ],
+          "outputName": "claimsRisk",
+          "outputValue": "LOW"
+        },
+        "D03": {
+          "decisionId": "D03",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            2,
+            151,
+            60000000
+          ],
+          "matchedRuleIds": [
+            "R-D03-07"
+          ],
+          "outputName": "vehicleEligibility",
+          "outputValue": "ELIGIBLE"
+        },
+        "D04": {
+          "decisionId": "D04",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            151,
+            "SPORT",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D04-04"
+          ],
+          "outputName": "vehicleRisk",
+          "outputValue": "HIGH"
+        },
+        "D07": {
+          "decisionId": "D07",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "MOTORCYCLE",
+            151,
+            "COMPREHENSIVE",
+            60000000
+          ],
+          "matchedRuleIds": [
+            "R-D07-04"
+          ],
+          "outputName": "basePremium",
+          "outputValue": 1500000
+        },
+        "D05": {
+          "decisionId": "D05",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "ELIGIBLE",
+            "HIGH"
+          ],
+          "matchedRuleIds": [
+            "R-D05-09"
+          ],
+          "outputName": "underwritingDecision",
+          "outputValue": "ACCEPT"
+        },
+        "D08": {
+          "decisionId": "D08",
+          "hitPolicy": "COLLECT (SUM)",
+          "inputValues": [
+            "LOW",
+            "LOW",
+            "HIGH",
+            "SPORT"
+          ],
+          "matchedRuleIds": [
+            "R-D08-03",
+            "R-D08-07",
+            "R-D08-09",
+            "R-D08-11"
+          ],
+          "outputName": "totalRiskLoading",
+          "outputValue": 0.35
+        },
+        "D06": {
+          "decisionId": "D06",
+          "hitPolicy": "FIRST",
+          "inputValues": [
+            "ACCEPT",
+            60000000,
+            "COMPREHENSIVE",
+            2
+          ],
+          "matchedRuleIds": [
+            "R-D06-04"
+          ],
+          "outputName": "inspectionDecision",
+          "outputValue": "NOT_REQUIRED"
+        },
+        "D09": {
+          "decisionId": "D09",
+          "hitPolicy": "UNIQUE",
+          "inputValues": [
+            "ACCEPT"
+          ],
+          "matchedRuleIds": [
+            "R-D09-02"
+          ],
+          "outputName": "finalPremium",
+          "outputValue": 2025000
+        }
+      },
+      "mismatches": [],
+      "pass": true
+    }
+  ]
+}

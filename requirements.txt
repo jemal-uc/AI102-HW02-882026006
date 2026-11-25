@@ -1,0 +1,6 @@
+# Python dependencies actually used by scripts/ in AI102 Homework-02
+defusedxml==0.7.1
+lxml==6.1.1
+networkx==3.6.1
+matplotlib==3.9.2
+PyMuPDF==2.0

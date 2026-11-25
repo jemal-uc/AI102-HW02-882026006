@@ -1,0 +1,51 @@
+# === Python Environments, Bytecode & Caches ===
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# === Node.js Dependencies & Caches ===
+node_modules/
+npm-debug.log*
+.npm/
+
+# === Build Artifacts, Temp Files & Logs ===
+/dist/
+/build/
+.next/
+.cache/
+coverage/
+*.log
+*.tmp
+*.bak
+
+# === IDE & OS Artifacts ===
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Secrets & Local Identity Configuration ===
+.env
+.env.*
+*.pem
+*.key
+.submission_identity.json
+
+# === Local-Only Lecturer Materials & Course Standards ===
+AI102_Homework-02_Decision-Modeling-DMN_Assignment.docx.pdf
+ACADEMIC-REPORT-STANDARD/
+
+# === Local-Only Academic Submission Deliverables (PII / NIM-Bearing) ===
+submission/
+*.zip
+src/decision-model/AI102-HW02-*.dmn
+reports/final-report/
+outputs/generated-artifacts/

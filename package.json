@@ -1,0 +1,18 @@
+{
+  "name": "runner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dmn-js": "^18.1.0",
+    "dmn-moddle": "^12.2.1",
+    "feelin": "^8.2.2"
+  }
+}

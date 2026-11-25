@@ -1,0 +1,2090 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" id="Definitions_AsuransiNusantara" name="AsuransiNusantara Motor Insurance Underwriting" namespace="https://asuransinusantara.example.edu/dmn/ai102-hw02" exporter="Canonical-Spec-Generator" exporterVersion="1.0.0">
+  <itemDefinition id="ItemDef_tVehicleType" name="tVehicleType">
+    <typeRef>string</typeRef>
+    <allowedValues id="Allowed_tVehicleType">
+      <text>&quot;MOTORCYCLE&quot;, &quot;CAR&quot;</text>
+    </allowedValues>
+  </itemDefinition>
+  <itemDefinition id="ItemDef_tPerformanceClass" name="tPerformanceClass">
+    <typeRef>string</typeRef>
+    <allowedValues id="Allowed_tPerformanceClass">
+      <text>&quot;STANDARD&quot;, &quot;SPORT&quot;, &quot;HIGH_PERFORMANCE&quot;</text>
+    </allowedValues>
+  </itemDefinition>
+  <itemDefinition id="ItemDef_tCoverType" name="tCoverType">
+    <typeRef>string</typeRef>
+    <allowedValues id="Allowed_tCoverType">
+      <text>&quot;TPO&quot;, &quot;COMPREHENSIVE&quot;</text>
+    </allowedValues>
+  </itemDefinition>
+  <itemDefinition id="ItemDef_tDriverRisk" name="tDriverRisk">
+    <typeRef>string</typeRef>
+    <allowedValues id="Allowed_tDriverRisk">
+      <text>&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;, &quot;INELIGIBLE&quot;, &quot;UNKNOWN&quot;</text>
+    </allowedValues>
+  </itemDefinition>
+  <itemDefinition id="ItemDef_tClaimsRisk" name="tClaimsRisk">
+    <typeRef>string</typeRef>
+    <allowedValues id="Allowed_tClaimsRisk">
+      <text>&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;, &quot;UNKNOWN&quot;</text>
+    </allowedValues>
+  </itemDefinition>
+  <itemDefinition id="ItemDef_tVehicleEligibility" name="tVehicleEligibility">
+    <typeRef>string</typeRef>
+    <allowedValues id="Allowed_tVehicleEligibility">
+      <text>&quot;ELIGIBLE&quot;, &quot;INELIGIBLE&quot;</text>
+    </allowedValues>
+  </itemDefinition>
+  <itemDefinition id="ItemDef_tVehicleRisk" name="tVehicleRisk">
+    <typeRef>string</typeRef>
+    <allowedValues id="Allowed_tVehicleRisk">
+      <text>&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;</text>
+    </allowedValues>
+  </itemDefinition>
+  <itemDefinition id="ItemDef_tUnderwritingDecision" name="tUnderwritingDecision">
+    <typeRef>string</typeRef>
+    <allowedValues id="Allowed_tUnderwritingDecision">
+      <text>&quot;ACCEPT&quot;, &quot;REFER&quot;, &quot;DECLINE&quot;</text>
+    </allowedValues>
+  </itemDefinition>
+  <itemDefinition id="ItemDef_tInspectionDecision" name="tInspectionDecision">
+    <typeRef>string</typeRef>
+    <allowedValues id="Allowed_tInspectionDecision">
+      <text>&quot;REQUIRED&quot;, &quot;NOT_REQUIRED&quot;, &quot;NOT_APPLICABLE&quot;</text>
+    </allowedValues>
+  </itemDefinition>
+  <itemDefinition id="ItemDef_tDateList" name="tDateList" isCollection="true">
+    <typeRef>date</typeRef>
+  </itemDefinition>
+  <inputData id="I01" name="dateOfBirth">
+    <variable id="Var_I01" name="dateOfBirth" typeRef="date"/>
+  </inputData>
+  <inputData id="I02" name="evaluationDate">
+    <variable id="Var_I02" name="evaluationDate" typeRef="date"/>
+  </inputData>
+  <inputData id="I03" name="claimsHistoryAvailable">
+    <variable id="Var_I03" name="claimsHistoryAvailable" typeRef="boolean"/>
+  </inputData>
+  <inputData id="I04" name="claimDates">
+    <variable id="Var_I04" name="claimDates" typeRef="tDateList"/>
+  </inputData>
+  <inputData id="I05" name="vehicleManufactureDate">
+    <variable id="Var_I05" name="vehicleManufactureDate" typeRef="date"/>
+  </inputData>
+  <inputData id="I06" name="vehicleType">
+    <variable id="Var_I06" name="vehicleType" typeRef="tVehicleType"/>
+  </inputData>
+  <inputData id="I07" name="engineCC">
+    <variable id="Var_I07" name="engineCC" typeRef="number"/>
+  </inputData>
+  <inputData id="I08" name="performanceClass">
+    <variable id="Var_I08" name="performanceClass" typeRef="tPerformanceClass"/>
+  </inputData>
+  <inputData id="I09" name="coverType">
+    <variable id="Var_I09" name="coverType" typeRef="tCoverType"/>
+  </inputData>
+  <inputData id="I10" name="insuredValue">
+    <variable id="Var_I10" name="insuredValue" typeRef="number"/>
+  </inputData>
+  <knowledgeSource id="KS01" name="AsuransiNusantara Underwriting Policy (Educational)"/>
+  <knowledgeSource id="KS02" name="AsuransiNusantara Motor Tariff &amp; Loading Schedule (Illustrative)"/>
+  <knowledgeSource id="KS03" name="Indonesian Traffic &amp; Licensing Law (UU No. 22/2009 — Min SIM Age 17)"/>
+  <businessKnowledgeModel id="BKM01" name="calculateAgeInYears">
+    <variable id="Var_BKM01" name="calculateAgeInYears" typeRef="number"/>
+    <encapsulatedLogic id="Logic_BKM01" kind="FEEL">
+      <formalParameter id="Param_BKM01_1" name="targetDate" typeRef="date"/>
+      <formalParameter id="Param_BKM01_2" name="referenceDate" typeRef="date"/>
+      <literalExpression id="Expr_BKM01" typeRef="number">
+        <text>if targetDate = null or referenceDate = null then null else if date(targetDate) = null or date(referenceDate) = null then null else if date(targetDate) &gt; date(referenceDate) then -1 else years and months duration(date(targetDate), date(referenceDate)).years</text>
+      </literalExpression>
+    </encapsulatedLogic>
+    <authorityRequirement id="AuthReq_BKM01_KS01">
+      <requiredAuthority href="#KS01"/>
+    </authorityRequirement>
+    <authorityRequirement id="AuthReq_BKM01_KS03">
+      <requiredAuthority href="#KS03"/>
+    </authorityRequirement>
+  </businessKnowledgeModel>
+  <businessKnowledgeModel id="BKM02" name="countRecentClaims">
+    <variable id="Var_BKM02" name="countRecentClaims" typeRef="number"/>
+    <encapsulatedLogic id="Logic_BKM02" kind="FEEL">
+      <formalParameter id="Param_BKM02_1" name="claimDates" typeRef="tDateList"/>
+      <formalParameter id="Param_BKM02_2" name="referenceDate" typeRef="date"/>
+      <formalParameter id="Param_BKM02_3" name="windowMonths" typeRef="number"/>
+      <literalExpression id="Expr_BKM02" typeRef="number">
+        <text>if claimDates = null or referenceDate = null or windowMonths = null then null else if date(referenceDate) = null then null else count((for d in claimDates return if d = null then null else if date(d) = null then null else if date(d) &gt;= (date(referenceDate) - duration(&quot;P&quot; + string(windowMonths) + &quot;M&quot;)) and date(d) &lt;= date(referenceDate) then d else null)[item != null])</text>
+      </literalExpression>
+    </encapsulatedLogic>
+    <authorityRequirement id="AuthReq_BKM02_KS01">
+      <requiredAuthority href="#KS01"/>
+    </authorityRequirement>
+  </businessKnowledgeModel>
+  <decision id="D01" name="Driver Risk Assessment">
+    <variable id="Var_D01" name="driverRisk" typeRef="tDriverRisk"/>
+    <informationRequirement id="InfoReq_D01_I01">
+      <requiredInput href="#I01"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D01_I02">
+      <requiredInput href="#I02"/>
+    </informationRequirement>
+    <knowledgeRequirement id="KnowReq_D01_BKM01">
+      <requiredKnowledge href="#BKM01"/>
+    </knowledgeRequirement>
+    <authorityRequirement id="AuthReq_D01_KS01">
+      <requiredAuthority href="#KS01"/>
+    </authorityRequirement>
+    <authorityRequirement id="AuthReq_D01_KS03">
+      <requiredAuthority href="#KS03"/>
+    </authorityRequirement>
+    <decisionTable id="DT_D01" hitPolicy="UNIQUE" outputLabel="driverRisk">
+      <input id="D01_in1" label="Driver Age (Years)">
+        <inputExpression id="D01_in1_expr" typeRef="number">
+          <text>calculateAgeInYears(dateOfBirth, evaluationDate)</text>
+        </inputExpression>
+      </input>
+      <output id="D01_out" name="driverRisk" typeRef="tDriverRisk">
+        <outputValues id="D01_outVals">
+          <text>&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;, &quot;INELIGIBLE&quot;, &quot;UNKNOWN&quot;</text>
+        </outputValues>
+      </output>
+      <rule id="R-D01-01">
+        <description>R-D01-01: Missing or malformed DOB or evaluationDate -&gt; unknown driver risk</description>
+        <inputEntry id="R-D01-01_in1">
+          <text>null</text>
+        </inputEntry>
+        <outputEntry id="R-D01-01_out1">
+          <text>&quot;UNKNOWN&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D01-02">
+        <description>R-D01-02: Explicit invalid future DOB sentinel (-1) -&gt; ineligible (never treated as valid age)</description>
+        <inputEntry id="R-D01-02_in1">
+          <text>&lt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D01-02_out1">
+          <text>&quot;INELIGIBLE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D01-03">
+        <description>R-D01-03: Underage applicant (&lt;17 Indonesian SIM A/C minimum) -&gt; ineligible</description>
+        <inputEntry id="R-D01-03_in1">
+          <text>[0..17)</text>
+        </inputEntry>
+        <outputEntry id="R-D01-03_out1">
+          <text>&quot;INELIGIBLE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D01-04">
+        <description>R-D01-04: Young driver (17-24 inclusive) -&gt; high risk</description>
+        <inputEntry id="R-D01-04_in1">
+          <text>[17..24]</text>
+        </inputEntry>
+        <outputEntry id="R-D01-04_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D01-05">
+        <description>R-D01-05: Prime adult driver (25-65 inclusive) -&gt; low risk</description>
+        <inputEntry id="R-D01-05_in1">
+          <text>[25..65]</text>
+        </inputEntry>
+        <outputEntry id="R-D01-05_out1">
+          <text>&quot;LOW&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D01-06">
+        <description>R-D01-06: Senior driver (&gt;65) -&gt; medium risk</description>
+        <inputEntry id="R-D01-06_in1">
+          <text>&gt; 65</text>
+        </inputEntry>
+        <outputEntry id="R-D01-06_out1">
+          <text>&quot;MEDIUM&quot;</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="D02" name="Claims Risk Assessment">
+    <variable id="Var_D02" name="claimsRisk" typeRef="tClaimsRisk"/>
+    <informationRequirement id="InfoReq_D02_I02">
+      <requiredInput href="#I02"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D02_I03">
+      <requiredInput href="#I03"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D02_I04">
+      <requiredInput href="#I04"/>
+    </informationRequirement>
+    <knowledgeRequirement id="KnowReq_D02_BKM02">
+      <requiredKnowledge href="#BKM02"/>
+    </knowledgeRequirement>
+    <authorityRequirement id="AuthReq_D02_KS01">
+      <requiredAuthority href="#KS01"/>
+    </authorityRequirement>
+    <decisionTable id="DT_D02" hitPolicy="FIRST" outputLabel="claimsRisk">
+      <input id="D02_in1" label="Claims History Available">
+        <inputExpression id="D02_in1_expr" typeRef="boolean">
+          <text>claimsHistoryAvailable</text>
+        </inputExpression>
+      </input>
+      <input id="D02_in2" label="Recent Claims (24M)">
+        <inputExpression id="D02_in2_expr" typeRef="number">
+          <text>countRecentClaims(claimDates, evaluationDate, 24)</text>
+        </inputExpression>
+      </input>
+      <output id="D02_out" name="claimsRisk" typeRef="tClaimsRisk">
+        <outputValues id="D02_outVals">
+          <text>&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;, &quot;UNKNOWN&quot;</text>
+        </outputValues>
+      </output>
+      <rule id="R-D02-01">
+        <description>R-D02-01: Missing or false claimsHistoryAvailable -&gt; UNKNOWN (never treated as clean)</description>
+        <inputEntry id="R-D02-01_in1">
+          <text>not(true)</text>
+        </inputEntry>
+        <inputEntry id="R-D02-01_in2">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D02-01_out1">
+          <text>&quot;UNKNOWN&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D02-02">
+        <description>R-D02-02: Null claimDates or missing evaluationDate -&gt; UNKNOWN</description>
+        <inputEntry id="R-D02-02_in1">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="R-D02-02_in2">
+          <text>null</text>
+        </inputEntry>
+        <outputEntry id="R-D02-02_out1">
+          <text>&quot;UNKNOWN&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D02-03">
+        <description>R-D02-03: Verified history with 0 claims in last 24 months</description>
+        <inputEntry id="R-D02-03_in1">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="R-D02-03_in2">
+          <text>0</text>
+        </inputEntry>
+        <outputEntry id="R-D02-03_out1">
+          <text>&quot;LOW&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D02-04">
+        <description>R-D02-04: Verified history with 1 claim in last 24 months</description>
+        <inputEntry id="R-D02-04_in1">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="R-D02-04_in2">
+          <text>1</text>
+        </inputEntry>
+        <outputEntry id="R-D02-04_out1">
+          <text>&quot;MEDIUM&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D02-05">
+        <description>R-D02-05: Verified history with &gt;= 2 claims in last 24 months</description>
+        <inputEntry id="R-D02-05_in1">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="R-D02-05_in2">
+          <text>&gt;= 2</text>
+        </inputEntry>
+        <outputEntry id="R-D02-05_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="D03" name="Vehicle Eligibility Assessment">
+    <variable id="Var_D03" name="vehicleEligibility" typeRef="tVehicleEligibility"/>
+    <informationRequirement id="InfoReq_D03_I02">
+      <requiredInput href="#I02"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D03_I05">
+      <requiredInput href="#I05"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D03_I06">
+      <requiredInput href="#I06"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D03_I07">
+      <requiredInput href="#I07"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D03_I10">
+      <requiredInput href="#I10"/>
+    </informationRequirement>
+    <knowledgeRequirement id="KnowReq_D03_BKM01">
+      <requiredKnowledge href="#BKM01"/>
+    </knowledgeRequirement>
+    <authorityRequirement id="AuthReq_D03_KS01">
+      <requiredAuthority href="#KS01"/>
+    </authorityRequirement>
+    <decisionTable id="DT_D03" hitPolicy="FIRST" outputLabel="vehicleEligibility">
+      <input id="D03_in1" label="Vehicle Type">
+        <inputExpression id="D03_in1_expr" typeRef="tVehicleType">
+          <text>vehicleType</text>
+        </inputExpression>
+      </input>
+      <input id="D03_in2" label="Vehicle Age (Years)">
+        <inputExpression id="D03_in2_expr" typeRef="number">
+          <text>calculateAgeInYears(vehicleManufactureDate, evaluationDate)</text>
+        </inputExpression>
+      </input>
+      <input id="D03_in3" label="Engine CC">
+        <inputExpression id="D03_in3_expr" typeRef="number">
+          <text>engineCC</text>
+        </inputExpression>
+      </input>
+      <input id="D03_in4" label="Insured Value (IDR)">
+        <inputExpression id="D03_in4_expr" typeRef="number">
+          <text>insuredValue</text>
+        </inputExpression>
+      </input>
+      <output id="D03_out" name="vehicleEligibility" typeRef="tVehicleEligibility">
+        <outputValues id="D03_outVals">
+          <text>&quot;ELIGIBLE&quot;, &quot;INELIGIBLE&quot;</text>
+        </outputValues>
+      </output>
+      <rule id="R-D03-01">
+        <description>R-D03-01: Unsupported or null vehicle type</description>
+        <inputEntry id="R-D03-01_in1">
+          <text>not(&quot;MOTORCYCLE&quot;, &quot;CAR&quot;)</text>
+        </inputEntry>
+        <inputEntry id="R-D03-01_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-01_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-01_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D03-01_out1">
+          <text>&quot;INELIGIBLE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D03-02">
+        <description>R-D03-02: Missing manufacture or evaluation date</description>
+        <inputEntry id="R-D03-02_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-02_in2">
+          <text>null</text>
+        </inputEntry>
+        <inputEntry id="R-D03-02_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-02_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D03-02_out1">
+          <text>&quot;INELIGIBLE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D03-03">
+        <description>R-D03-03: Invalid future manufacture date</description>
+        <inputEntry id="R-D03-03_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-03_in2">
+          <text>&lt; 0</text>
+        </inputEntry>
+        <inputEntry id="R-D03-03_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-03_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D03-03_out1">
+          <text>&quot;INELIGIBLE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D03-04">
+        <description>R-D03-04: Very old vehicle (&gt; 15 completed years)</description>
+        <inputEntry id="R-D03-04_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-04_in2">
+          <text>&gt; 15</text>
+        </inputEntry>
+        <inputEntry id="R-D03-04_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-04_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D03-04_out1">
+          <text>&quot;INELIGIBLE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D03-05">
+        <description>R-D03-05: Missing or non-positive engine displacement</description>
+        <inputEntry id="R-D03-05_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-05_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-05_in3">
+          <text>null, &lt;= 0</text>
+        </inputEntry>
+        <inputEntry id="R-D03-05_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D03-05_out1">
+          <text>&quot;INELIGIBLE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D03-06">
+        <description>R-D03-06: Missing or non-positive insured value</description>
+        <inputEntry id="R-D03-06_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-06_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-06_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D03-06_in4">
+          <text>null, &lt;= 0</text>
+        </inputEntry>
+        <outputEntry id="R-D03-06_out1">
+          <text>&quot;INELIGIBLE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D03-07">
+        <description>R-D03-07: Valid vehicle type, age &lt;= 15 years, positive cc and value</description>
+        <inputEntry id="R-D03-07_in1">
+          <text>&quot;MOTORCYCLE&quot;, &quot;CAR&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D03-07_in2">
+          <text>[0..15]</text>
+        </inputEntry>
+        <inputEntry id="R-D03-07_in3">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <inputEntry id="R-D03-07_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D03-07_out1">
+          <text>&quot;ELIGIBLE&quot;</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="D04" name="Vehicle Risk Assessment">
+    <variable id="Var_D04" name="vehicleRisk" typeRef="tVehicleRisk"/>
+    <informationRequirement id="InfoReq_D04_I02">
+      <requiredInput href="#I02"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D04_I05">
+      <requiredInput href="#I05"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D04_I06">
+      <requiredInput href="#I06"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D04_I07">
+      <requiredInput href="#I07"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D04_I08">
+      <requiredInput href="#I08"/>
+    </informationRequirement>
+    <knowledgeRequirement id="KnowReq_D04_BKM01">
+      <requiredKnowledge href="#BKM01"/>
+    </knowledgeRequirement>
+    <authorityRequirement id="AuthReq_D04_KS01">
+      <requiredAuthority href="#KS01"/>
+    </authorityRequirement>
+    <decisionTable id="DT_D04" hitPolicy="FIRST" outputLabel="vehicleRisk">
+      <input id="D04_in1" label="Vehicle Type">
+        <inputExpression id="D04_in1_expr" typeRef="tVehicleType">
+          <text>vehicleType</text>
+        </inputExpression>
+      </input>
+      <input id="D04_in2" label="Engine CC">
+        <inputExpression id="D04_in2_expr" typeRef="number">
+          <text>engineCC</text>
+        </inputExpression>
+      </input>
+      <input id="D04_in3" label="Performance Class">
+        <inputExpression id="D04_in3_expr" typeRef="tPerformanceClass">
+          <text>performanceClass</text>
+        </inputExpression>
+      </input>
+      <input id="D04_in4" label="Vehicle Age (Years)">
+        <inputExpression id="D04_in4_expr" typeRef="number">
+          <text>calculateAgeInYears(vehicleManufactureDate, evaluationDate)</text>
+        </inputExpression>
+      </input>
+      <output id="D04_out" name="vehicleRisk" typeRef="tVehicleRisk">
+        <outputValues id="D04_outVals">
+          <text>&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;</text>
+        </outputValues>
+      </output>
+      <rule id="R-D04-00a">
+        <description>R-D04-00a: Conservative HIGH guard for missing/invalid vehicleType</description>
+        <inputEntry id="R-D04-00a_in1">
+          <text>not(&quot;MOTORCYCLE&quot;, &quot;CAR&quot;)</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00a_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00a_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00a_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-00a_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-00b">
+        <description>R-D04-00b: Conservative HIGH guard for missing/non-positive engineCC</description>
+        <inputEntry id="R-D04-00b_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00b_in2">
+          <text>null, &lt;= 0</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00b_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00b_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-00b_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-00c">
+        <description>R-D04-00c: Conservative HIGH guard for missing/invalid performanceClass</description>
+        <inputEntry id="R-D04-00c_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00c_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00c_in3">
+          <text>not(&quot;STANDARD&quot;, &quot;SPORT&quot;, &quot;HIGH_PERFORMANCE&quot;)</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00c_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-00c_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-00d">
+        <description>R-D04-00d: Conservative HIGH guard for missing/future vehicleAge (-1)</description>
+        <inputEntry id="R-D04-00d_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00d_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00d_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-00d_in4">
+          <text>null, &lt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D04-00d_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-01">
+        <description>R-D04-01: High-performance classification always yields HIGH vehicle risk</description>
+        <inputEntry id="R-D04-01_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-01_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-01_in3">
+          <text>&quot;HIGH_PERFORMANCE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D04-01_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-01_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-02">
+        <description>R-D04-02: Large-displacement motorcycle (&gt; 250cc)</description>
+        <inputEntry id="R-D04-02_in1">
+          <text>&quot;MOTORCYCLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D04-02_in2">
+          <text>&gt; 250</text>
+        </inputEntry>
+        <inputEntry id="R-D04-02_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-02_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-02_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-03">
+        <description>R-D04-03: Large-displacement car (&gt; 2500cc)</description>
+        <inputEntry id="R-D04-03_in1">
+          <text>&quot;CAR&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D04-03_in2">
+          <text>&gt; 2500</text>
+        </inputEntry>
+        <inputEntry id="R-D04-03_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-03_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-03_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-04">
+        <description>R-D04-04: Mid-size sport motorcycle (&gt;150-250cc + SPORT)</description>
+        <inputEntry id="R-D04-04_in1">
+          <text>&quot;MOTORCYCLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D04-04_in2">
+          <text>(150..250]</text>
+        </inputEntry>
+        <inputEntry id="R-D04-04_in3">
+          <text>&quot;SPORT&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D04-04_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-04_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-05">
+        <description>R-D04-05: Mid-size motorcycle (150-250cc)</description>
+        <inputEntry id="R-D04-05_in1">
+          <text>&quot;MOTORCYCLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D04-05_in2">
+          <text>(150..250]</text>
+        </inputEntry>
+        <inputEntry id="R-D04-05_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-05_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-05_out1">
+          <text>&quot;MEDIUM&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-06">
+        <description>R-D04-06: Mid-size car (1500-2500cc)</description>
+        <inputEntry id="R-D04-06_in1">
+          <text>&quot;CAR&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D04-06_in2">
+          <text>(1500..2500]</text>
+        </inputEntry>
+        <inputEntry id="R-D04-06_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-06_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-06_out1">
+          <text>&quot;MEDIUM&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-07">
+        <description>R-D04-07: Sport trim on compact engine</description>
+        <inputEntry id="R-D04-07_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-07_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-07_in3">
+          <text>&quot;SPORT&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D04-07_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-07_out1">
+          <text>&quot;MEDIUM&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-08">
+        <description>R-D04-08: Aging vehicle (&gt; 10 years)</description>
+        <inputEntry id="R-D04-08_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-08_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-08_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-08_in4">
+          <text>&gt; 10</text>
+        </inputEntry>
+        <outputEntry id="R-D04-08_out1">
+          <text>&quot;MEDIUM&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-09">
+        <description>R-D04-09: Standard compact vehicle aged &lt;= 10 years</description>
+        <inputEntry id="R-D04-09_in1">
+          <text>&quot;MOTORCYCLE&quot;, &quot;CAR&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D04-09_in2">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <inputEntry id="R-D04-09_in3">
+          <text>&quot;STANDARD&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D04-09_in4">
+          <text>[0..10]</text>
+        </inputEntry>
+        <outputEntry id="R-D04-09_out1">
+          <text>&quot;LOW&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D04-10">
+        <description>R-D04-10: Conservative fallback for missing/invalid vehicle attributes</description>
+        <inputEntry id="R-D04-10_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-10_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-10_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D04-10_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D04-10_out1">
+          <text>&quot;HIGH&quot;</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="D05" name="Underwriting Decision">
+    <variable id="Var_D05" name="underwritingDecision" typeRef="tUnderwritingDecision"/>
+    <informationRequirement id="InfoReq_D05_D01">
+      <requiredDecision href="#D01"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D05_D02">
+      <requiredDecision href="#D02"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D05_D03">
+      <requiredDecision href="#D03"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D05_D04">
+      <requiredDecision href="#D04"/>
+    </informationRequirement>
+    <authorityRequirement id="AuthReq_D05_KS01">
+      <requiredAuthority href="#KS01"/>
+    </authorityRequirement>
+    <decisionTable id="DT_D05" hitPolicy="FIRST" outputLabel="underwritingDecision">
+      <input id="D05_in1" label="Driver Risk">
+        <inputExpression id="D05_in1_expr" typeRef="tDriverRisk">
+          <text>driverRisk</text>
+        </inputExpression>
+      </input>
+      <input id="D05_in2" label="Claims Risk">
+        <inputExpression id="D05_in2_expr" typeRef="tClaimsRisk">
+          <text>claimsRisk</text>
+        </inputExpression>
+      </input>
+      <input id="D05_in3" label="Vehicle Eligibility">
+        <inputExpression id="D05_in3_expr" typeRef="tVehicleEligibility">
+          <text>vehicleEligibility</text>
+        </inputExpression>
+      </input>
+      <input id="D05_in4" label="Vehicle Risk">
+        <inputExpression id="D05_in4_expr" typeRef="tVehicleRisk">
+          <text>vehicleRisk</text>
+        </inputExpression>
+      </input>
+      <output id="D05_out" name="underwritingDecision" typeRef="tUnderwritingDecision">
+        <outputValues id="D05_outVals">
+          <text>&quot;ACCEPT&quot;, &quot;REFER&quot;, &quot;DECLINE&quot;</text>
+        </outputValues>
+      </output>
+      <rule id="R-D05-01">
+        <description>R-D05-01: Hard eligibility gate: ineligible vehicle always declined</description>
+        <inputEntry id="R-D05-01_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-01_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-01_in3">
+          <text>&quot;INELIGIBLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-01_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D05-01_out1">
+          <text>&quot;DECLINE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D05-02">
+        <description>R-D05-02: Hard eligibility gate: underage/ineligible driver declined</description>
+        <inputEntry id="R-D05-02_in1">
+          <text>&quot;INELIGIBLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-02_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-02_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-02_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D05-02_out1">
+          <text>&quot;DECLINE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D05-03">
+        <description>R-D05-03: Extreme compound risk (young + &gt;=2 claims + high-risk vehicle)</description>
+        <inputEntry id="R-D05-03_in1">
+          <text>&quot;HIGH&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-03_in2">
+          <text>&quot;HIGH&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-03_in3">
+          <text>&quot;ELIGIBLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-03_in4">
+          <text>&quot;HIGH&quot;</text>
+        </inputEntry>
+        <outputEntry id="R-D05-03_out1">
+          <text>&quot;DECLINE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D05-04">
+        <description>R-D05-04: Missing driver DOB -&gt; refer for identity/age verification</description>
+        <inputEntry id="R-D05-04_in1">
+          <text>&quot;UNKNOWN&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-04_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-04_in3">
+          <text>&quot;ELIGIBLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-04_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D05-04_out1">
+          <text>&quot;REFER&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D05-05">
+        <description>R-D05-05: Missing claims history -&gt; refer (never auto-accept)</description>
+        <inputEntry id="R-D05-05_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-05_in2">
+          <text>&quot;UNKNOWN&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-05_in3">
+          <text>&quot;ELIGIBLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-05_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D05-05_out1">
+          <text>&quot;REFER&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D05-06">
+        <description>R-D05-06: High claims frequency (&gt;=2 recent claims) -&gt; senior review</description>
+        <inputEntry id="R-D05-06_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-06_in2">
+          <text>&quot;HIGH&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-06_in3">
+          <text>&quot;ELIGIBLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-06_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D05-06_out1">
+          <text>&quot;REFER&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D05-07">
+        <description>R-D05-07: Young driver with high-risk/high-performance vehicle</description>
+        <inputEntry id="R-D05-07_in1">
+          <text>&quot;HIGH&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-07_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-07_in3">
+          <text>&quot;ELIGIBLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-07_in4">
+          <text>&quot;HIGH&quot;</text>
+        </inputEntry>
+        <outputEntry id="R-D05-07_out1">
+          <text>&quot;REFER&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D05-08">
+        <description>R-D05-08: Young driver with recent claim history</description>
+        <inputEntry id="R-D05-08_in1">
+          <text>&quot;HIGH&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-08_in2">
+          <text>&quot;MEDIUM&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-08_in3">
+          <text>&quot;ELIGIBLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-08_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D05-08_out1">
+          <text>&quot;REFER&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D05-09">
+        <description>R-D05-09: All remaining eligible, verified, acceptable risk profiles</description>
+        <inputEntry id="R-D05-09_in1">
+          <text>&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-09_in2">
+          <text>&quot;LOW&quot;, &quot;MEDIUM&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-09_in3">
+          <text>&quot;ELIGIBLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D05-09_in4">
+          <text>&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;</text>
+        </inputEntry>
+        <outputEntry id="R-D05-09_out1">
+          <text>&quot;ACCEPT&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D05-10">
+        <description>R-D05-10: Defensive fallback for unexpected state</description>
+        <inputEntry id="R-D05-10_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-10_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-10_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D05-10_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D05-10_out1">
+          <text>&quot;REFER&quot;</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="D06" name="Inspection Decision">
+    <variable id="Var_D06" name="inspectionDecision" typeRef="tInspectionDecision"/>
+    <informationRequirement id="InfoReq_D06_D05">
+      <requiredDecision href="#D05"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D06_I02">
+      <requiredInput href="#I02"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D06_I05">
+      <requiredInput href="#I05"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D06_I09">
+      <requiredInput href="#I09"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D06_I10">
+      <requiredInput href="#I10"/>
+    </informationRequirement>
+    <knowledgeRequirement id="KnowReq_D06_BKM01">
+      <requiredKnowledge href="#BKM01"/>
+    </knowledgeRequirement>
+    <authorityRequirement id="AuthReq_D06_KS01">
+      <requiredAuthority href="#KS01"/>
+    </authorityRequirement>
+    <decisionTable id="DT_D06" hitPolicy="FIRST" outputLabel="inspectionDecision">
+      <input id="D06_in1" label="Underwriting Decision">
+        <inputExpression id="D06_in1_expr" typeRef="tUnderwritingDecision">
+          <text>underwritingDecision</text>
+        </inputExpression>
+      </input>
+      <input id="D06_in2" label="Insured Value (IDR)">
+        <inputExpression id="D06_in2_expr" typeRef="number">
+          <text>insuredValue</text>
+        </inputExpression>
+      </input>
+      <input id="D06_in3" label="Cover Type">
+        <inputExpression id="D06_in3_expr" typeRef="tCoverType">
+          <text>coverType</text>
+        </inputExpression>
+      </input>
+      <input id="D06_in4" label="Vehicle Age (Years)">
+        <inputExpression id="D06_in4_expr" typeRef="number">
+          <text>calculateAgeInYears(vehicleManufactureDate, evaluationDate)</text>
+        </inputExpression>
+      </input>
+      <output id="D06_out" name="inspectionDecision" typeRef="tInspectionDecision">
+        <outputValues id="D06_outVals">
+          <text>&quot;REQUIRED&quot;, &quot;NOT_REQUIRED&quot;, &quot;NOT_APPLICABLE&quot;</text>
+        </outputValues>
+      </output>
+      <rule id="R-D06-01">
+        <description>R-D06-01: Declined policies do not undergo inspection</description>
+        <inputEntry id="R-D06-01_in1">
+          <text>&quot;DECLINE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D06-01_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D06-01_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D06-01_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D06-01_out1">
+          <text>&quot;NOT_APPLICABLE&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D06-02">
+        <description>R-D06-02: High-value vehicle (&gt;= Rp500M) always requires physical inspection</description>
+        <inputEntry id="R-D06-02_in1">
+          <text>&quot;ACCEPT&quot;, &quot;REFER&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D06-02_in2">
+          <text>&gt;= 500000000</text>
+        </inputEntry>
+        <inputEntry id="R-D06-02_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D06-02_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D06-02_out1">
+          <text>&quot;REQUIRED&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D06-03">
+        <description>R-D06-03: Older vehicle (&gt;10 years) requesting Comprehensive cover requires inspection</description>
+        <inputEntry id="R-D06-03_in1">
+          <text>&quot;ACCEPT&quot;, &quot;REFER&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D06-03_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D06-03_in3">
+          <text>&quot;COMPREHENSIVE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D06-03_in4">
+          <text>&gt; 10</text>
+        </inputEntry>
+        <outputEntry id="R-D06-03_out1">
+          <text>&quot;REQUIRED&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D06-04">
+        <description>R-D06-04: Standard-value vehicle within normal age</description>
+        <inputEntry id="R-D06-04_in1">
+          <text>&quot;ACCEPT&quot;, &quot;REFER&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D06-04_in2">
+          <text>&lt; 500000000</text>
+        </inputEntry>
+        <inputEntry id="R-D06-04_in3">
+          <text>&quot;TPO&quot;, &quot;COMPREHENSIVE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D06-04_in4">
+          <text>[0..10]</text>
+        </inputEntry>
+        <outputEntry id="R-D06-04_out1">
+          <text>&quot;NOT_REQUIRED&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D06-05">
+        <description>R-D06-05: Older TPO policy below Rp500M does not require own-damage inspection</description>
+        <inputEntry id="R-D06-05_in1">
+          <text>&quot;ACCEPT&quot;, &quot;REFER&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D06-05_in2">
+          <text>&lt; 500000000</text>
+        </inputEntry>
+        <inputEntry id="R-D06-05_in3">
+          <text>&quot;TPO&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D06-05_in4">
+          <text>&gt; 10</text>
+        </inputEntry>
+        <outputEntry id="R-D06-05_out1">
+          <text>&quot;NOT_REQUIRED&quot;</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D06-06">
+        <description>R-D06-06: Conservative fallback requiring inspection on incomplete data</description>
+        <inputEntry id="R-D06-06_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D06-06_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D06-06_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D06-06_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D06-06_out1">
+          <text>&quot;REQUIRED&quot;</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="D07" name="Base Premium Calculation">
+    <variable id="Var_D07" name="basePremium" typeRef="number"/>
+    <informationRequirement id="InfoReq_D07_I06">
+      <requiredInput href="#I06"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D07_I07">
+      <requiredInput href="#I07"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D07_I09">
+      <requiredInput href="#I09"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D07_I10">
+      <requiredInput href="#I10"/>
+    </informationRequirement>
+    <authorityRequirement id="AuthReq_D07_KS02">
+      <requiredAuthority href="#KS02"/>
+    </authorityRequirement>
+    <decisionTable id="DT_D07" hitPolicy="FIRST" outputLabel="basePremium">
+      <input id="D07_in1" label="Vehicle Type">
+        <inputExpression id="D07_in1_expr" typeRef="tVehicleType">
+          <text>vehicleType</text>
+        </inputExpression>
+      </input>
+      <input id="D07_in2" label="Engine CC">
+        <inputExpression id="D07_in2_expr" typeRef="number">
+          <text>engineCC</text>
+        </inputExpression>
+      </input>
+      <input id="D07_in3" label="Cover Type">
+        <inputExpression id="D07_in3_expr" typeRef="tCoverType">
+          <text>coverType</text>
+        </inputExpression>
+      </input>
+      <input id="D07_in4" label="Insured Value (IDR)">
+        <inputExpression id="D07_in4_expr" typeRef="number">
+          <text>insuredValue</text>
+        </inputExpression>
+      </input>
+      <output id="D07_out" name="basePremium" typeRef="number"/>
+      <rule id="R-D07-00">
+        <description>R-D07-00: Guard: missing or non-positive insuredValue yields 0 (avoids floor/null error)</description>
+        <inputEntry id="R-D07-00_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D07-00_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D07-00_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D07-00_in4">
+          <text>null, &lt;= 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-00_out1">
+          <text>0</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-01">
+        <description>R-D07-01: MC &lt;=150cc TPO: 0.5%, floor Rp150k</description>
+        <inputEntry id="R-D07-01_in1">
+          <text>&quot;MOTORCYCLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-01_in2">
+          <text>(0..150]</text>
+        </inputEntry>
+        <inputEntry id="R-D07-01_in3">
+          <text>&quot;TPO&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-01_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-01_out1">
+          <text>decimal(max(150000, insuredValue * 0.005), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-02">
+        <description>R-D07-02: MC &lt;=150cc Comp: 2.0%, floor Rp300k</description>
+        <inputEntry id="R-D07-02_in1">
+          <text>&quot;MOTORCYCLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-02_in2">
+          <text>(0..150]</text>
+        </inputEntry>
+        <inputEntry id="R-D07-02_in3">
+          <text>&quot;COMPREHENSIVE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-02_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-02_out1">
+          <text>decimal(max(300000, insuredValue * 0.020), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-03">
+        <description>R-D07-03: MC 151-250cc TPO: 0.7%, floor Rp200k</description>
+        <inputEntry id="R-D07-03_in1">
+          <text>&quot;MOTORCYCLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-03_in2">
+          <text>(150..250]</text>
+        </inputEntry>
+        <inputEntry id="R-D07-03_in3">
+          <text>&quot;TPO&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-03_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-03_out1">
+          <text>decimal(max(200000, insuredValue * 0.007), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-04">
+        <description>R-D07-04: MC 151-250cc Comp: 2.5%, floor Rp450k</description>
+        <inputEntry id="R-D07-04_in1">
+          <text>&quot;MOTORCYCLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-04_in2">
+          <text>(150..250]</text>
+        </inputEntry>
+        <inputEntry id="R-D07-04_in3">
+          <text>&quot;COMPREHENSIVE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-04_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-04_out1">
+          <text>decimal(max(450000, insuredValue * 0.025), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-05">
+        <description>R-D07-05: MC &gt;250cc TPO: 1.0%, floor Rp350k</description>
+        <inputEntry id="R-D07-05_in1">
+          <text>&quot;MOTORCYCLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-05_in2">
+          <text>&gt; 250</text>
+        </inputEntry>
+        <inputEntry id="R-D07-05_in3">
+          <text>&quot;TPO&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-05_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-05_out1">
+          <text>decimal(max(350000, insuredValue * 0.010), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-06">
+        <description>R-D07-06: MC &gt;250cc Comp: 3.2%, floor Rp750k</description>
+        <inputEntry id="R-D07-06_in1">
+          <text>&quot;MOTORCYCLE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-06_in2">
+          <text>&gt; 250</text>
+        </inputEntry>
+        <inputEntry id="R-D07-06_in3">
+          <text>&quot;COMPREHENSIVE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-06_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-06_out1">
+          <text>decimal(max(750000, insuredValue * 0.032), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-07">
+        <description>R-D07-07: Car &lt;=1500cc TPO: 0.4%, floor Rp500k</description>
+        <inputEntry id="R-D07-07_in1">
+          <text>&quot;CAR&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-07_in2">
+          <text>(0..1500]</text>
+        </inputEntry>
+        <inputEntry id="R-D07-07_in3">
+          <text>&quot;TPO&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-07_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-07_out1">
+          <text>decimal(max(500000, insuredValue * 0.004), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-08">
+        <description>R-D07-08: Car &lt;=1500cc Comp: 1.8%, floor Rp1.5M</description>
+        <inputEntry id="R-D07-08_in1">
+          <text>&quot;CAR&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-08_in2">
+          <text>(0..1500]</text>
+        </inputEntry>
+        <inputEntry id="R-D07-08_in3">
+          <text>&quot;COMPREHENSIVE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-08_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-08_out1">
+          <text>decimal(max(1500000, insuredValue * 0.018), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-09">
+        <description>R-D07-09: Car 1501-2500cc TPO: 0.5%, floor Rp650k</description>
+        <inputEntry id="R-D07-09_in1">
+          <text>&quot;CAR&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-09_in2">
+          <text>(1500..2500]</text>
+        </inputEntry>
+        <inputEntry id="R-D07-09_in3">
+          <text>&quot;TPO&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-09_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-09_out1">
+          <text>decimal(max(650000, insuredValue * 0.005), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-10">
+        <description>R-D07-10: Car 1501-2500cc Comp: 2.2%, floor Rp2.0M</description>
+        <inputEntry id="R-D07-10_in1">
+          <text>&quot;CAR&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-10_in2">
+          <text>(1500..2500]</text>
+        </inputEntry>
+        <inputEntry id="R-D07-10_in3">
+          <text>&quot;COMPREHENSIVE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-10_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-10_out1">
+          <text>decimal(max(2000000, insuredValue * 0.022), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-11">
+        <description>R-D07-11: Car &gt;2500cc TPO: 0.6%, floor Rp850k</description>
+        <inputEntry id="R-D07-11_in1">
+          <text>&quot;CAR&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-11_in2">
+          <text>&gt; 2500</text>
+        </inputEntry>
+        <inputEntry id="R-D07-11_in3">
+          <text>&quot;TPO&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-11_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-11_out1">
+          <text>decimal(max(850000, insuredValue * 0.006), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-12">
+        <description>R-D07-12: Car &gt;2500cc Comp: 2.8%, floor Rp2.5M</description>
+        <inputEntry id="R-D07-12_in1">
+          <text>&quot;CAR&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-12_in2">
+          <text>&gt; 2500</text>
+        </inputEntry>
+        <inputEntry id="R-D07-12_in3">
+          <text>&quot;COMPREHENSIVE&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D07-12_in4">
+          <text>&gt; 0</text>
+        </inputEntry>
+        <outputEntry id="R-D07-12_out1">
+          <text>decimal(max(2500000, insuredValue * 0.028), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D07-13">
+        <description>R-D07-13: Fallback for invalid/missing vehicle, engineCC, or coverType</description>
+        <inputEntry id="R-D07-13_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D07-13_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D07-13_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D07-13_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D07-13_out1">
+          <text>0</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="D08" name="Risk Loading Calculation">
+    <variable id="Var_D08" name="totalRiskLoading" typeRef="number"/>
+    <informationRequirement id="InfoReq_D08_D01">
+      <requiredDecision href="#D01"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D08_D02">
+      <requiredDecision href="#D02"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D08_D04">
+      <requiredDecision href="#D04"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D08_I08">
+      <requiredInput href="#I08"/>
+    </informationRequirement>
+    <authorityRequirement id="AuthReq_D08_KS02">
+      <requiredAuthority href="#KS02"/>
+    </authorityRequirement>
+    <decisionTable id="DT_D08" hitPolicy="COLLECT" outputLabel="totalRiskLoading" aggregation="SUM">
+      <input id="D08_in1" label="Driver Risk">
+        <inputExpression id="D08_in1_expr" typeRef="tDriverRisk">
+          <text>driverRisk</text>
+        </inputExpression>
+      </input>
+      <input id="D08_in2" label="Claims Risk">
+        <inputExpression id="D08_in2_expr" typeRef="tClaimsRisk">
+          <text>claimsRisk</text>
+        </inputExpression>
+      </input>
+      <input id="D08_in3" label="Vehicle Risk">
+        <inputExpression id="D08_in3_expr" typeRef="tVehicleRisk">
+          <text>vehicleRisk</text>
+        </inputExpression>
+      </input>
+      <input id="D08_in4" label="Performance Class">
+        <inputExpression id="D08_in4_expr" typeRef="tPerformanceClass">
+          <text>performanceClass</text>
+        </inputExpression>
+      </input>
+      <output id="D08_out" name="totalRiskLoading" typeRef="number"/>
+      <rule id="R-D08-01">
+        <description>R-D08-01: Young driver loading (+25%)</description>
+        <inputEntry id="R-D08-01_in1">
+          <text>&quot;HIGH&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D08-01_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-01_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-01_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D08-01_out1">
+          <text>0.25</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-02">
+        <description>R-D08-02: Senior driver loading (+10%)</description>
+        <inputEntry id="R-D08-02_in1">
+          <text>&quot;MEDIUM&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D08-02_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-02_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-02_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D08-02_out1">
+          <text>0.10</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-03">
+        <description>R-D08-03: No driver surcharge (or handled by decline/refer)</description>
+        <inputEntry id="R-D08-03_in1">
+          <text>&quot;LOW&quot;, &quot;INELIGIBLE&quot;, &quot;UNKNOWN&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D08-03_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-03_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-03_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D08-03_out1">
+          <text>0.00</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-04">
+        <description>R-D08-04: 1 recent claim loading (+20%)</description>
+        <inputEntry id="R-D08-04_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-04_in2">
+          <text>&quot;MEDIUM&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D08-04_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-04_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D08-04_out1">
+          <text>0.20</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-05">
+        <description>R-D08-05: 2+ recent claims loading (+40%)</description>
+        <inputEntry id="R-D08-05_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-05_in2">
+          <text>&quot;HIGH&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D08-05_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-05_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D08-05_out1">
+          <text>0.40</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-06">
+        <description>R-D08-06: Missing claims history provisional loading (+25%)</description>
+        <inputEntry id="R-D08-06_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-06_in2">
+          <text>&quot;UNKNOWN&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D08-06_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-06_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D08-06_out1">
+          <text>0.25</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-07">
+        <description>R-D08-07: Clean claims record (+0%)</description>
+        <inputEntry id="R-D08-07_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-07_in2">
+          <text>&quot;LOW&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D08-07_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-07_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D08-07_out1">
+          <text>0.00</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-08">
+        <description>R-D08-08: Medium vehicle technical risk loading (+10%)</description>
+        <inputEntry id="R-D08-08_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-08_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-08_in3">
+          <text>&quot;MEDIUM&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D08-08_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D08-08_out1">
+          <text>0.10</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-09">
+        <description>R-D08-09: High vehicle technical risk loading (+20%)</description>
+        <inputEntry id="R-D08-09_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-09_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-09_in3">
+          <text>&quot;HIGH&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D08-09_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D08-09_out1">
+          <text>0.20</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-10">
+        <description>R-D08-10: Low vehicle technical risk (+0%)</description>
+        <inputEntry id="R-D08-10_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-10_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-10_in3">
+          <text>&quot;LOW&quot;</text>
+        </inputEntry>
+        <inputEntry id="R-D08-10_in4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="R-D08-10_out1">
+          <text>0.00</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-11">
+        <description>R-D08-11: Sport trim surcharge (+15%)</description>
+        <inputEntry id="R-D08-11_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-11_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-11_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-11_in4">
+          <text>&quot;SPORT&quot;</text>
+        </inputEntry>
+        <outputEntry id="R-D08-11_out1">
+          <text>0.15</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-12">
+        <description>R-D08-12: High-performance surcharge (+30%)</description>
+        <inputEntry id="R-D08-12_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-12_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-12_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-12_in4">
+          <text>&quot;HIGH_PERFORMANCE&quot;</text>
+        </inputEntry>
+        <outputEntry id="R-D08-12_out1">
+          <text>0.30</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-13">
+        <description>R-D08-13: Standard performance class (+0%)</description>
+        <inputEntry id="R-D08-13_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-13_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-13_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-13_in4">
+          <text>&quot;STANDARD&quot;</text>
+        </inputEntry>
+        <outputEntry id="R-D08-13_out1">
+          <text>0.00</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D08-14">
+        <description>R-D08-14: Conservative fallback (+30%) for missing/invalid performance class</description>
+        <inputEntry id="R-D08-14_in1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-14_in2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-14_in3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="R-D08-14_in4">
+          <text>not(&quot;STANDARD&quot;, &quot;SPORT&quot;, &quot;HIGH_PERFORMANCE&quot;)</text>
+        </inputEntry>
+        <outputEntry id="R-D08-14_out1">
+          <text>0.30</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="D09" name="Final Premium Calculation">
+    <variable id="Var_D09" name="finalPremium" typeRef="number"/>
+    <informationRequirement id="InfoReq_D09_D05">
+      <requiredDecision href="#D05"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D09_D07">
+      <requiredDecision href="#D07"/>
+    </informationRequirement>
+    <informationRequirement id="InfoReq_D09_D08">
+      <requiredDecision href="#D08"/>
+    </informationRequirement>
+    <authorityRequirement id="AuthReq_D09_KS02">
+      <requiredAuthority href="#KS02"/>
+    </authorityRequirement>
+    <decisionTable id="DT_D09" hitPolicy="UNIQUE" outputLabel="finalPremium">
+      <input id="D09_in1" label="Underwriting Decision">
+        <inputExpression id="D09_in1_expr" typeRef="tUnderwritingDecision">
+          <text>underwritingDecision</text>
+        </inputExpression>
+      </input>
+      <output id="D09_out" name="finalPremium" typeRef="number"/>
+      <rule id="R-D09-01">
+        <description>R-D09-01: Declined risk incurs zero premium</description>
+        <inputEntry id="R-D09-01_in1">
+          <text>&quot;DECLINE&quot;</text>
+        </inputEntry>
+        <outputEntry id="R-D09-01_out1">
+          <text>0</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D09-02">
+        <description>R-D09-02: Accepted policy premium with additive risk loading</description>
+        <inputEntry id="R-D09-02_in1">
+          <text>&quot;ACCEPT&quot;</text>
+        </inputEntry>
+        <outputEntry id="R-D09-02_out1">
+          <text>decimal(basePremium * (1 + totalRiskLoading), 0)</text>
+        </outputEntry>
+      </rule>
+      <rule id="R-D09-03">
+        <description>R-D09-03: Provisional indicative premium pending senior underwriter review</description>
+        <inputEntry id="R-D09-03_in1">
+          <text>&quot;REFER&quot;</text>
+        </inputEntry>
+        <outputEntry id="R-D09-03_out1">
+          <text>decimal(basePremium * (1 + totalRiskLoading), 0)</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_DRD">
+      <dmndi:DMNShape id="Shape_I01" dmnElementRef="I01">
+        <dc:Bounds x="60" y="650" width="145" height="45"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_I02" dmnElementRef="I02">
+        <dc:Bounds x="230" y="650" width="145" height="45"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_I03" dmnElementRef="I03">
+        <dc:Bounds x="400" y="650" width="165" height="45"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_I04" dmnElementRef="I04">
+        <dc:Bounds x="590" y="650" width="140" height="45"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_I05" dmnElementRef="I05">
+        <dc:Bounds x="755" y="650" width="175" height="45"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_I06" dmnElementRef="I06">
+        <dc:Bounds x="955" y="650" width="140" height="45"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_I07" dmnElementRef="I07">
+        <dc:Bounds x="1120" y="650" width="140" height="45"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_I08" dmnElementRef="I08">
+        <dc:Bounds x="1285" y="650" width="155" height="45"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_I09" dmnElementRef="I09">
+        <dc:Bounds x="1465" y="650" width="140" height="45"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_I10" dmnElementRef="I10">
+        <dc:Bounds x="1630" y="650" width="145" height="45"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_BKM01" dmnElementRef="BKM01">
+        <dc:Bounds x="390" y="515" width="185" height="55"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_BKM02" dmnElementRef="BKM02">
+        <dc:Bounds x="630" y="515" width="185" height="55"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_KS03" dmnElementRef="KS03">
+        <dc:Bounds x="40" y="365" width="170" height="65"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_KS01" dmnElementRef="KS01">
+        <dc:Bounds x="40" y="200" width="170" height="65"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_KS02" dmnElementRef="KS02">
+        <dc:Bounds x="1620" y="200" width="175" height="65"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_D01" dmnElementRef="D01">
+        <dc:Bounds x="250" y="365" width="190" height="68"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_D02" dmnElementRef="D02">
+        <dc:Bounds x="480" y="365" width="190" height="68"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_D03" dmnElementRef="D03">
+        <dc:Bounds x="720" y="365" width="200" height="68"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_D04" dmnElementRef="D04">
+        <dc:Bounds x="970" y="365" width="190" height="68"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_D07" dmnElementRef="D07">
+        <dc:Bounds x="1370" y="365" width="200" height="68"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_D05" dmnElementRef="D05">
+        <dc:Bounds x="560" y="200" width="200" height="68"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_D08" dmnElementRef="D08">
+        <dc:Bounds x="1190" y="200" width="200" height="68"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_D06" dmnElementRef="D06">
+        <dc:Bounds x="720" y="50" width="200" height="68"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="Shape_D09" dmnElementRef="D09">
+        <dc:Bounds x="1120" y="50" width="200" height="68"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="Edge_AuthReq_BKM01_KS01" dmnElementRef="AuthReq_BKM01_KS01">
+        <di:waypoint x="125" y="265"/>
+        <di:waypoint x="482" y="515"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_BKM01_KS03" dmnElementRef="AuthReq_BKM01_KS03">
+        <di:waypoint x="125" y="430"/>
+        <di:waypoint x="482" y="515"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_BKM02_KS01" dmnElementRef="AuthReq_BKM02_KS01">
+        <di:waypoint x="125" y="265"/>
+        <di:waypoint x="722" y="515"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D01_I01" dmnElementRef="InfoReq_D01_I01">
+        <di:waypoint x="132" y="650"/>
+        <di:waypoint x="345" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D01_I02" dmnElementRef="InfoReq_D01_I02">
+        <di:waypoint x="302" y="650"/>
+        <di:waypoint x="345" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_KnowReq_D01_BKM01" dmnElementRef="KnowReq_D01_BKM01">
+        <di:waypoint x="482" y="515"/>
+        <di:waypoint x="345" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_D01_KS01" dmnElementRef="AuthReq_D01_KS01">
+        <di:waypoint x="125" y="265"/>
+        <di:waypoint x="345" y="365"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_D01_KS03" dmnElementRef="AuthReq_D01_KS03">
+        <di:waypoint x="210" y="397"/>
+        <di:waypoint x="250" y="399"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D02_I02" dmnElementRef="InfoReq_D02_I02">
+        <di:waypoint x="302" y="650"/>
+        <di:waypoint x="575" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D02_I03" dmnElementRef="InfoReq_D02_I03">
+        <di:waypoint x="482" y="650"/>
+        <di:waypoint x="575" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D02_I04" dmnElementRef="InfoReq_D02_I04">
+        <di:waypoint x="660" y="650"/>
+        <di:waypoint x="575" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_KnowReq_D02_BKM02" dmnElementRef="KnowReq_D02_BKM02">
+        <di:waypoint x="722" y="515"/>
+        <di:waypoint x="575" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_D02_KS01" dmnElementRef="AuthReq_D02_KS01">
+        <di:waypoint x="125" y="265"/>
+        <di:waypoint x="575" y="365"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D03_I02" dmnElementRef="InfoReq_D03_I02">
+        <di:waypoint x="302" y="650"/>
+        <di:waypoint x="820" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D03_I05" dmnElementRef="InfoReq_D03_I05">
+        <di:waypoint x="842" y="650"/>
+        <di:waypoint x="820" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D03_I06" dmnElementRef="InfoReq_D03_I06">
+        <di:waypoint x="1025" y="650"/>
+        <di:waypoint x="820" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D03_I07" dmnElementRef="InfoReq_D03_I07">
+        <di:waypoint x="1190" y="650"/>
+        <di:waypoint x="820" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D03_I10" dmnElementRef="InfoReq_D03_I10">
+        <di:waypoint x="1702" y="650"/>
+        <di:waypoint x="820" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_KnowReq_D03_BKM01" dmnElementRef="KnowReq_D03_BKM01">
+        <di:waypoint x="482" y="515"/>
+        <di:waypoint x="820" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_D03_KS01" dmnElementRef="AuthReq_D03_KS01">
+        <di:waypoint x="125" y="265"/>
+        <di:waypoint x="820" y="365"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D04_I02" dmnElementRef="InfoReq_D04_I02">
+        <di:waypoint x="302" y="650"/>
+        <di:waypoint x="1065" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D04_I05" dmnElementRef="InfoReq_D04_I05">
+        <di:waypoint x="842" y="650"/>
+        <di:waypoint x="1065" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D04_I06" dmnElementRef="InfoReq_D04_I06">
+        <di:waypoint x="1025" y="650"/>
+        <di:waypoint x="1065" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D04_I07" dmnElementRef="InfoReq_D04_I07">
+        <di:waypoint x="1190" y="650"/>
+        <di:waypoint x="1065" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D04_I08" dmnElementRef="InfoReq_D04_I08">
+        <di:waypoint x="1362" y="650"/>
+        <di:waypoint x="1065" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_KnowReq_D04_BKM01" dmnElementRef="KnowReq_D04_BKM01">
+        <di:waypoint x="482" y="515"/>
+        <di:waypoint x="1065" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_D04_KS01" dmnElementRef="AuthReq_D04_KS01">
+        <di:waypoint x="125" y="265"/>
+        <di:waypoint x="1065" y="365"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D05_D01" dmnElementRef="InfoReq_D05_D01">
+        <di:waypoint x="345" y="365"/>
+        <di:waypoint x="660" y="268"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D05_D02" dmnElementRef="InfoReq_D05_D02">
+        <di:waypoint x="575" y="365"/>
+        <di:waypoint x="660" y="268"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D05_D03" dmnElementRef="InfoReq_D05_D03">
+        <di:waypoint x="820" y="365"/>
+        <di:waypoint x="660" y="268"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D05_D04" dmnElementRef="InfoReq_D05_D04">
+        <di:waypoint x="1065" y="365"/>
+        <di:waypoint x="660" y="268"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_D05_KS01" dmnElementRef="AuthReq_D05_KS01">
+        <di:waypoint x="210" y="232"/>
+        <di:waypoint x="560" y="234"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D06_D05" dmnElementRef="InfoReq_D06_D05">
+        <di:waypoint x="660" y="200"/>
+        <di:waypoint x="820" y="118"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D06_I02" dmnElementRef="InfoReq_D06_I02">
+        <di:waypoint x="302" y="650"/>
+        <di:waypoint x="820" y="118"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D06_I05" dmnElementRef="InfoReq_D06_I05">
+        <di:waypoint x="842" y="650"/>
+        <di:waypoint x="820" y="118"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D06_I09" dmnElementRef="InfoReq_D06_I09">
+        <di:waypoint x="1535" y="650"/>
+        <di:waypoint x="820" y="118"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D06_I10" dmnElementRef="InfoReq_D06_I10">
+        <di:waypoint x="1702" y="650"/>
+        <di:waypoint x="820" y="118"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_KnowReq_D06_BKM01" dmnElementRef="KnowReq_D06_BKM01">
+        <di:waypoint x="482" y="515"/>
+        <di:waypoint x="820" y="118"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_D06_KS01" dmnElementRef="AuthReq_D06_KS01">
+        <di:waypoint x="125" y="200"/>
+        <di:waypoint x="820" y="118"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D07_I06" dmnElementRef="InfoReq_D07_I06">
+        <di:waypoint x="1025" y="650"/>
+        <di:waypoint x="1470" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D07_I07" dmnElementRef="InfoReq_D07_I07">
+        <di:waypoint x="1190" y="650"/>
+        <di:waypoint x="1470" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D07_I09" dmnElementRef="InfoReq_D07_I09">
+        <di:waypoint x="1535" y="650"/>
+        <di:waypoint x="1470" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D07_I10" dmnElementRef="InfoReq_D07_I10">
+        <di:waypoint x="1702" y="650"/>
+        <di:waypoint x="1470" y="433"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_D07_KS02" dmnElementRef="AuthReq_D07_KS02">
+        <di:waypoint x="1707" y="265"/>
+        <di:waypoint x="1470" y="365"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D08_D01" dmnElementRef="InfoReq_D08_D01">
+        <di:waypoint x="345" y="365"/>
+        <di:waypoint x="1290" y="268"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D08_D02" dmnElementRef="InfoReq_D08_D02">
+        <di:waypoint x="575" y="365"/>
+        <di:waypoint x="1290" y="268"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D08_D04" dmnElementRef="InfoReq_D08_D04">
+        <di:waypoint x="1065" y="365"/>
+        <di:waypoint x="1290" y="268"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D08_I08" dmnElementRef="InfoReq_D08_I08">
+        <di:waypoint x="1362" y="650"/>
+        <di:waypoint x="1290" y="268"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_D08_KS02" dmnElementRef="AuthReq_D08_KS02">
+        <di:waypoint x="1620" y="232"/>
+        <di:waypoint x="1390" y="234"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D09_D05" dmnElementRef="InfoReq_D09_D05">
+        <di:waypoint x="660" y="200"/>
+        <di:waypoint x="1220" y="118"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D09_D07" dmnElementRef="InfoReq_D09_D07">
+        <di:waypoint x="1470" y="365"/>
+        <di:waypoint x="1220" y="118"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_InfoReq_D09_D08" dmnElementRef="InfoReq_D09_D08">
+        <di:waypoint x="1290" y="200"/>
+        <di:waypoint x="1220" y="118"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="Edge_AuthReq_D09_KS02" dmnElementRef="AuthReq_D09_KS02">
+        <di:waypoint x="1707" y="200"/>
+        <di:waypoint x="1220" y="118"/>
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
