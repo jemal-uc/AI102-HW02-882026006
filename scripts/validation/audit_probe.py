@@ -9,7 +9,7 @@ DMN_PATH = ROOT / "src" / "decision-model" / "AsuransiNusantara.dmn"
 SPEC_PATH = ROOT / "src" / "specification" / "CANONICAL_DECISION_SPECIFICATION.json"
 RES_PATH = ROOT / "tests" / "test-results" / "TEST_RESULTS.json"
 IDENTITY_PATH = ROOT / ".submission_identity.json"
-PDF_PATH = ROOT / "reports" / "final-report" / "AI102_HW02_AsuransiNusantara_Report.pdf"
+PDF_PATH = ROOT / "reports" / "AI102_HW02_AsuransiNusantara_Report.pdf"
 SUB_PDF_PATH = ROOT / "submission" / "AI102_HW02_AsuransiNusantara_Report.pdf"
 
 

@@ -44,21 +44,22 @@ BKMS = {
 }
 
 KSS = {
-    "KS03": (7.5, 25.5, 11.8, 5.2, "KS03: UU 22/2009\n(Min SIM Age 17)"),
-    "KS01": (7.5, 37.5, 11.8, 5.2, "KS01: Underwriting\nPolicy (Educ.)"),
-    "KS02": (92.0, 37.5, 12.2, 5.2, "KS02: Tariff & Loading\nSchedule (Illus.)"),
+    "KS03": (7.5, 24.0, 12.8, 5.2, "KS03: UU 22/2009 &\nPerpol 5/2021 (SIM)"),
+    "KS01": (7.5, 34.5, 12.8, 5.2, "KS01: Underwriting\nPolicy (Educ.)"),
+    "KS02": (92.0, 34.5, 12.8, 5.2, "KS02: Illus. Tariff &\nLoading Schedule"),
 }
 
 DECS = {
-    "D01": (21.5, 25.5, 12.2, 5.4, "D01: Driver Risk\n[UNIQUE]"),
-    "D02": (36.5, 25.5, 12.2, 5.4, "D02: Claims Risk\n[FIRST]"),
-    "D03": (51.5, 25.5, 13.0, 5.4, "D03: Vehicle Eligibility\n[FIRST]"),
-    "D04": (66.5, 25.5, 12.2, 5.4, "D04: Vehicle Risk\n[FIRST]"),
-    "D07": (83.5, 25.5, 13.2, 5.4, "D07: Base Premium\n[FIRST]"),
-    "D05": (41.0, 37.5, 14.0, 5.4, "D05: Underwriting Decision\n[FIRST]"),
-    "D08": (73.5, 37.5, 14.0, 5.4, "D08: Risk Loading\n[COLLECT SUM]"),
-    "D06": (47.0, 48.5, 14.5, 5.4, "D06: Inspection Decision\n[FIRST]"),
-    "D09": (71.5, 48.5, 14.5, 5.4, "D09: Final Premium\n[UNIQUE]"),
+    "D01": (21.5, 24.0, 12.0, 5.0, "D01: Driver Risk\n[UNIQUE]"),
+    "D02": (36.0, 24.0, 12.0, 5.0, "D02: Claims Risk\n[FIRST]"),
+    "D03": (51.0, 24.0, 12.8, 5.0, "D03: Vehicle Eligibility\n[FIRST]"),
+    "D04": (66.0, 24.0, 12.0, 5.0, "D04: Vehicle Risk\n[FIRST]"),
+    "D07": (83.0, 24.0, 13.0, 5.0, "D07: Base Premium\n[FIRST]"),
+    "D05": (41.0, 34.5, 13.8, 5.0, "D05: Underwriting Decision\n[FIRST]"),
+    "D08": (73.5, 34.5, 13.8, 5.0, "D08: Risk Loading\n[COLLECT SUM]"),
+    "D06": (41.0, 44.5, 14.2, 5.0, "D06: Inspection Decision\n[FIRST]"),
+    "D10": (68.0, 44.5, 14.8, 5.0, "D10: Quote Readiness\n[FIRST]"),
+    "D09": (86.0, 51.8, 14.4, 5.0, "D09: Final Premium\n[FIRST]"),
 }
 
 ALL_NODES = {**INPUTS, **BKMS, **KSS, **DECS}
@@ -103,7 +104,8 @@ INFO_EDGES = [
     ("D01", "D05"), ("D02", "D05"), ("D03", "D05"), ("D04", "D05"),
     ("D01", "D08"), ("D02", "D08"), ("D04", "D08"), ("I08", "D08"),
     ("D05", "D06"), ("I02", "D06"), ("I05", "D06"), ("I09", "D06"), ("I10", "D06"),
-    ("D05", "D09"), ("D07", "D09"), ("D08", "D09"),
+    ("D05", "D10"), ("I06", "D10"), ("I07", "D10"), ("I09", "D10"), ("I10", "D10"), ("D07", "D10"),
+    ("D05", "D09"), ("D10", "D09"), ("D07", "D09"), ("D08", "D09"),
 ]
 KNOW_EDGES = [
     ("BKM01", "D01"), ("BKM01", "D03"), ("BKM01", "D04"), ("BKM01", "D06"),
@@ -111,8 +113,8 @@ KNOW_EDGES = [
 ]
 AUTH_EDGES = [
     ("KS03", "D01"), ("KS03", "BKM01"),
-    ("KS01", "D01"), ("KS01", "D02"), ("KS01", "D03"), ("KS01", "D04"), ("KS01", "D05"), ("KS01", "D06"),
-    ("KS02", "D07"), ("KS02", "D08"), ("KS02", "D09"),
+    ("KS01", "D01"), ("KS01", "D02"), ("KS01", "D03"), ("KS01", "D04"), ("KS01", "D05"), ("KS01", "D06"), ("KS01", "D10"),
+    ("KS02", "D07"), ("KS02", "D08"), ("KS02", "D09"), ("KS02", "D10"),
 ]
 
 for s, d in AUTH_EDGES:
@@ -155,19 +157,19 @@ for nid, (cx, cy, w, h, lbl) in DECS.items():
     ax.text(cx, cy, lbl, ha="center", va="center", fontsize=7.2, fontweight="bold", color=NAVY, zorder=4)
 
 # Legend box
-leg_x, leg_y = 1.5, 46.0
+leg_x, leg_y = 1.5, 46.5
 ax.add_patch(FancyBboxPatch((leg_x, leg_y), 25.5, 8.8, boxstyle="round,pad=0.2,rounding_size=0.4",
                             facecolor="#F8FAFC", edgecolor="#CBD5E1", linewidth=0.9, zorder=3))
-ax.text(leg_x + 0.8, leg_y + 7.2, "DMN 1.3 DRD Legend (Acyclic 4-Tier DAG)", fontsize=7.2, fontweight="bold", color=NAVY, zorder=4)
+ax.text(leg_x + 0.8, leg_y + 7.2, "DMN 1.3 DRD Legend (Acyclic 5-Tier DAG)", fontsize=7.2, fontweight="bold", color=NAVY, zorder=4)
 ax.annotate("", xy=(leg_x + 5.5, leg_y + 5.2), xytext=(leg_x + 0.8, leg_y + 5.2),
             arrowprops=dict(arrowstyle="-|>,head_length=0.4,head_width=0.2", color=NAVY, lw=1.0), zorder=4)
-ax.text(leg_x + 6.2, leg_y + 5.2, "Information Requirement (35 edges)", fontsize=6.6, va="center", color=TEXT_DARK, zorder=4)
+ax.text(leg_x + 6.2, leg_y + 5.2, "Information Requirement (42 edges)", fontsize=6.6, va="center", color=TEXT_DARK, zorder=4)
 ax.annotate("", xy=(leg_x + 5.5, leg_y + 3.2), xytext=(leg_x + 0.8, leg_y + 3.2),
             arrowprops=dict(arrowstyle="->,head_length=0.4,head_width=0.25", color=BKM_EDGE, lw=1.0, ls="--"), zorder=4)
 ax.text(leg_x + 6.2, leg_y + 3.2, "Knowledge Requirement (5 edges)", fontsize=6.6, va="center", color=TEXT_DARK, zorder=4)
 ax.plot([leg_x + 0.8, leg_x + 5.2], [leg_y + 1.3, leg_y + 1.3], color=KS_EDGE, lw=1.0, ls=":", zorder=4)
 ax.plot(leg_x + 5.3, leg_y + 1.3, marker="o", markersize=3.2, color=KS_EDGE, zorder=4)
-ax.text(leg_x + 6.2, leg_y + 1.3, "Authority Requirement (11+2 BKM)", fontsize=6.6, va="center", color=TEXT_DARK, zorder=4)
+ax.text(leg_x + 6.2, leg_y + 1.3, "Authority Requirement (13+2 BKM)", fontsize=6.6, va="center", color=TEXT_DARK, zorder=4)
 
 plt.tight_layout(pad=0.3)
 fig.savefig(OUT_PNG, dpi=300, bbox_inches="tight", facecolor="white")

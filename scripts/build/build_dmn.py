@@ -19,7 +19,7 @@ ET.register_namespace("dmndi", NS_DMNDI)
 ET.register_namespace("dc", NS_DC)
 ET.register_namespace("di", NS_DI)
 
-# Clean non-overlapping 4-tier DRD coordinates (wide landscape layout for crisp Camunda/dmn-js rendering)
+# Clean non-overlapping 5-tier DRD coordinates (wide landscape layout for crisp Camunda/dmn-js rendering)
 LAYOUT = {
     # Tier 0: Inputs (y=650)
     "I01": (60, 650, 145, 45),
@@ -36,21 +36,23 @@ LAYOUT = {
     "BKM01": (390, 515, 185, 55),
     "BKM02": (630, 515, 185, 55),
     # Knowledge Sources
-    "KS03": (40, 365, 170, 65),
-    "KS01": (40, 200, 170, 65),
-    "KS02": (1620, 200, 175, 65),
+    "KS03": (40, 365, 175, 65),
+    "KS01": (40, 235, 175, 65),
+    "KS02": (1620, 235, 175, 65),
     # Tier 1 Decisions (y=365)
     "D01": (250, 365, 190, 68),
     "D02": (480, 365, 190, 68),
     "D03": (720, 365, 200, 68),
     "D04": (970, 365, 190, 68),
     "D07": (1370, 365, 200, 68),
-    # Tier 2 Decisions (y=200)
-    "D05": (560, 200, 200, 68),
-    "D08": (1190, 200, 200, 68),
-    # Tier 3 Decisions (y=50)
-    "D06": (720, 50, 200, 68),
-    "D09": (1120, 50, 200, 68),
+    # Tier 2 Decisions (y=235)
+    "D05": (560, 235, 200, 68),
+    "D08": (1190, 235, 200, 68),
+    # Tier 3 Decisions (y=120)
+    "D06": (560, 120, 200, 68),
+    "D10": (1180, 120, 210, 68),
+    # Tier 4 Decisions (y=15)
+    "D09": (1030, 15, 200, 68),
 }
 
 
@@ -97,13 +99,14 @@ def build_dmn():
     enum_types = [
         ("tVehicleType", "string", ["\"MOTORCYCLE\"", "\"CAR\""]),
         ("tPerformanceClass", "string", ["\"STANDARD\"", "\"SPORT\"", "\"HIGH_PERFORMANCE\""]),
-        ("tCoverType", "string", ["\"TPO\"", "\"COMPREHENSIVE\""]),
+        ("tCoverType", "string", ["\"TPO\"", "\"THIRD_PARTY_ONLY\"", "\"COMPREHENSIVE\""]),
         ("tDriverRisk", "string", ["\"LOW\"", "\"MEDIUM\"", "\"HIGH\"", "\"INELIGIBLE\"", "\"UNKNOWN\""]),
         ("tClaimsRisk", "string", ["\"LOW\"", "\"MEDIUM\"", "\"HIGH\"", "\"UNKNOWN\""]),
         ("tVehicleEligibility", "string", ["\"ELIGIBLE\"", "\"INELIGIBLE\""]),
         ("tVehicleRisk", "string", ["\"LOW\"", "\"MEDIUM\"", "\"HIGH\""]),
         ("tUnderwritingDecision", "string", ["\"ACCEPT\"", "\"REFER\"", "\"DECLINE\""]),
         ("tInspectionDecision", "string", ["\"REQUIRED\"", "\"NOT_REQUIRED\"", "\"NOT_APPLICABLE\""]),
+        ("tQuoteReadiness", "string", ["\"READY\"", "\"PENDING_INFORMATION\"", "\"INVALID_INPUT\"", "\"NOT_APPLICABLE\""]),
     ]
     for tid, base, vals in enum_types:
         idef = ET.SubElement(defs, qname(NS_DMN, "itemDefinition"), {"id": f"ItemDef_{tid}", "name": tid})
@@ -177,6 +180,8 @@ def build_dmn():
             "id": dec["id"],
             "name": dec["label"],
         })
+        if dec.get("description"):
+            ET.SubElement(del_el, qname(NS_DMN, "description")).text = dec["description"]
         ET.SubElement(del_el, qname(NS_DMN, "variable"), {
             "id": f"Var_{dec['id']}",
             "name": dec["outputName"],

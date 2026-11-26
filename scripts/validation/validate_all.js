@@ -142,7 +142,7 @@ async function main() {
   };
 
   // 2. Execute end-to-end test cases in topological order directly from the parsed DMN XML
-  const evalOrder = ["D01", "D02", "D03", "D04", "D07", "D05", "D08", "D06", "D09"];
+  const evalOrder = ["D01", "D02", "D03", "D04", "D07", "D05", "D08", "D06", "D10", "D09"];
   const tcResults = [];
   let tcPassed = 0;
 
@@ -169,6 +169,7 @@ async function main() {
       vehicleRisk: ctx.vehicleRisk,
       underwritingDecision: ctx.underwritingDecision,
       inspectionDecision: ctx.inspectionDecision,
+      quoteReadiness: ctx.quoteReadiness,
       basePremium: ctx.basePremium,
       totalRiskLoading: ctx.totalRiskLoading,
       finalPremium: ctx.finalPremium,

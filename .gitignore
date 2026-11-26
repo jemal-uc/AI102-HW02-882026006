@@ -48,4 +48,6 @@ submission/
 *.zip
 src/decision-model/AI102-HW02-*.dmn
 reports/final-report/
+reports/AI102_HW02_AsuransiNusantara_Report.html
+reports/AI102_HW02_AsuransiNusantara_Report.pdf
 outputs/generated-artifacts/

@@ -166,26 +166,29 @@ function executeDecisionTable(decEl, ctx, itemDefsMap) {
 // Pure independent JS reference arithmetic check (zero shared code with DMN/FEEL)
 function independentPremiumRef(inputs, dmnDecisions) {
   const { vehicleType, engineCC, coverType, insuredValue } = inputs;
-  let base = 0;
-  if (typeof insuredValue === "number" && insuredValue > 0 && typeof engineCC === "number" && engineCC > 0) {
+  const isTpo = coverType === "TPO" || coverType === "THIRD_PARTY_ONLY";
+  const isComp = coverType === "COMPREHENSIVE";
+  let base = null;
+  if (typeof insuredValue === "number" && insuredValue > 0 && typeof engineCC === "number" && engineCC > 0 && (isTpo || isComp)) {
     if (vehicleType === "MOTORCYCLE") {
-      if (engineCC <= 150) base = coverType === "TPO" ? Math.max(150000, insuredValue * 0.005) : coverType === "COMPREHENSIVE" ? Math.max(300000, insuredValue * 0.020) : 0;
-      else if (engineCC <= 250) base = coverType === "TPO" ? Math.max(200000, insuredValue * 0.007) : coverType === "COMPREHENSIVE" ? Math.max(450000, insuredValue * 0.025) : 0;
-      else base = coverType === "TPO" ? Math.max(350000, insuredValue * 0.010) : coverType === "COMPREHENSIVE" ? Math.max(750000, insuredValue * 0.032) : 0;
+      if (engineCC <= 150) base = isTpo ? Math.max(150000, insuredValue * 0.005) : Math.max(300000, insuredValue * 0.020);
+      else if (engineCC <= 250) base = isTpo ? Math.max(200000, insuredValue * 0.007) : Math.max(450000, insuredValue * 0.025);
+      else base = isTpo ? Math.max(350000, insuredValue * 0.010) : Math.max(750000, insuredValue * 0.032);
     } else if (vehicleType === "CAR") {
-      if (engineCC <= 1500) base = coverType === "TPO" ? Math.max(500000, insuredValue * 0.004) : coverType === "COMPREHENSIVE" ? Math.max(1500000, insuredValue * 0.018) : 0;
-      else if (engineCC <= 2500) base = coverType === "TPO" ? Math.max(650000, insuredValue * 0.005) : coverType === "COMPREHENSIVE" ? Math.max(2000000, insuredValue * 0.022) : 0;
-      else base = coverType === "TPO" ? Math.max(850000, insuredValue * 0.006) : coverType === "COMPREHENSIVE" ? Math.max(2500000, insuredValue * 0.028) : 0;
+      if (engineCC <= 1500) base = isTpo ? Math.max(500000, insuredValue * 0.004) : Math.max(1500000, insuredValue * 0.018);
+      else if (engineCC <= 2500) base = isTpo ? Math.max(650000, insuredValue * 0.005) : Math.max(2000000, insuredValue * 0.022);
+      else base = isTpo ? Math.max(850000, insuredValue * 0.006) : Math.max(2500000, insuredValue * 0.028);
     }
   }
-  base = Math.round(base);
+  if (base !== null) base = Math.round(base);
 
   const lDrv = dmnDecisions.driverRisk === "HIGH" ? 0.25 : dmnDecisions.driverRisk === "MEDIUM" ? 0.10 : 0;
   const lClm = dmnDecisions.claimsRisk === "MEDIUM" ? 0.20 : dmnDecisions.claimsRisk === "HIGH" ? 0.40 : dmnDecisions.claimsRisk === "UNKNOWN" ? 0.25 : 0;
   const lVeh = dmnDecisions.vehicleRisk === "MEDIUM" ? 0.10 : dmnDecisions.vehicleRisk === "HIGH" ? 0.20 : 0;
   const lPerf = inputs.performanceClass === "SPORT" ? 0.15 : inputs.performanceClass === "STANDARD" ? 0 : 0.30;
   const loading = Math.round((lDrv + lClm + lVeh + lPerf) * 1e6) / 1e6;
-  const finalPrem = dmnDecisions.underwritingDecision === "DECLINE" ? 0 : Math.round(base * (1 + loading));
+  const canIssue = dmnDecisions.underwritingDecision === "ACCEPT" && dmnDecisions.quoteReadiness === "READY" && base !== null && base > 0;
+  const finalPrem = canIssue ? Math.round(base * (1 + loading)) : null;
   return { base, loading, finalPrem };
 }
 
@@ -206,63 +209,63 @@ async function main() {
   const topoOrder = buildDynamicTopoOrder(decsMap);
   const bkmFns = bindBkmFunctions(defs);
 
-  // 8 additional adversarial audit cases beyond TC-01..TC-10
+  // Preserved Stage 2 adversarial FEEL/date/null edge cases (renumbered TC-20..TC-27)
   const adversarialCases = [
     {
-      id: "TC-11",
-      name: "Audit Edge — Future dateOfBirth (2027-01-01 -> -1 Sentinel -> Explicit Decline)",
-      category: "Audit Adversarial",
+      id: "TC-20",
+      name: "Stage 2 Adversarial — Future dateOfBirth (2027-01-01 -> -1 Sentinel -> Explicit Decline, Null Premium)",
+      category: "Stage 2 Adversarial Preserved",
       inputs: { dateOfBirth: "2027-01-01", evaluationDate: "2026-11-25", claimsHistoryAvailable: true, claimDates: [], vehicleManufactureDate: "2024-01-01", vehicleType: "CAR", engineCC: 1500, performanceClass: "STANDARD", coverType: "COMPREHENSIVE", insuredValue: 200000000 },
-      expected: { driverRisk: "INELIGIBLE", claimsRisk: "LOW", vehicleEligibility: "ELIGIBLE", vehicleRisk: "LOW", underwritingDecision: "DECLINE", inspectionDecision: "NOT_APPLICABLE", basePremium: 3600000, totalRiskLoading: 0.0, finalPremium: 0 }
+      expected: { driverRisk: "INELIGIBLE", claimsRisk: "LOW", vehicleEligibility: "ELIGIBLE", vehicleRisk: "LOW", underwritingDecision: "DECLINE", inspectionDecision: "NOT_APPLICABLE", quoteReadiness: "NOT_APPLICABLE", basePremium: 3600000, totalRiskLoading: 0.0, finalPremium: null }
     },
     {
-      id: "TC-12",
-      name: "Audit Edge — Future vehicleManufactureDate (2027-06-01 -> -1 -> Decline)",
-      category: "Audit Adversarial",
+      id: "TC-21",
+      name: "Stage 2 Adversarial — Future vehicleManufactureDate (2027-06-01 -> -1 -> Decline, Null Premium)",
+      category: "Stage 2 Adversarial Preserved",
       inputs: { dateOfBirth: "1990-01-01", evaluationDate: "2026-11-25", claimsHistoryAvailable: true, claimDates: [], vehicleManufactureDate: "2027-06-01", vehicleType: "CAR", engineCC: 1500, performanceClass: "STANDARD", coverType: "TPO", insuredValue: 150000000 },
-      expected: { driverRisk: "LOW", claimsRisk: "LOW", vehicleEligibility: "INELIGIBLE", vehicleRisk: "HIGH", underwritingDecision: "DECLINE", inspectionDecision: "NOT_APPLICABLE", basePremium: 600000, totalRiskLoading: 0.2, finalPremium: 0 }
+      expected: { driverRisk: "LOW", claimsRisk: "LOW", vehicleEligibility: "INELIGIBLE", vehicleRisk: "HIGH", underwritingDecision: "DECLINE", inspectionDecision: "NOT_APPLICABLE", quoteReadiness: "NOT_APPLICABLE", basePremium: 600000, totalRiskLoading: 0.2, finalPremium: null }
     },
     {
-      id: "TC-13",
-      name: "Audit Edge — Zero/Null insuredValue Guard (D07 returns 0 with 0 warnings)",
-      category: "Audit Adversarial",
-      inputs: { dateOfBirth: "1990-01-01", evaluationDate: "2026-11-25", claimsHistoryAvailable: true, claimDates: [], vehicleManufactureDate: "2024-01-01", vehicleType: "CAR", engineCC: 1500, performanceClass: "STANDARD", coverType: "TPO", insuredValue: null },
-      expected: { driverRisk: "LOW", claimsRisk: "LOW", vehicleEligibility: "INELIGIBLE", vehicleRisk: "LOW", underwritingDecision: "DECLINE", inspectionDecision: "NOT_APPLICABLE", basePremium: 0, totalRiskLoading: 0.0, finalPremium: 0 }
+      id: "TC-22",
+      name: "Stage 2/5 Adversarial — Non-Positive insuredValue (<=0 -> Ineligible/Decline, Base=null, Final=null)",
+      category: "Stage 2 Adversarial Preserved",
+      inputs: { dateOfBirth: "1990-01-01", evaluationDate: "2026-11-25", claimsHistoryAvailable: true, claimDates: [], vehicleManufactureDate: "2024-01-01", vehicleType: "CAR", engineCC: 1500, performanceClass: "STANDARD", coverType: "TPO", insuredValue: -100000 },
+      expected: { driverRisk: "LOW", claimsRisk: "LOW", vehicleEligibility: "INELIGIBLE", vehicleRisk: "LOW", underwritingDecision: "DECLINE", inspectionDecision: "NOT_APPLICABLE", quoteReadiness: "NOT_APPLICABLE", basePremium: null, totalRiskLoading: 0.0, finalPremium: null }
     },
     {
-      id: "TC-14",
-      name: "Audit Edge — Missing performanceClass (null -> Conservative HIGH +50% Loading)",
-      category: "Audit Adversarial",
+      id: "TC-23",
+      name: "Stage 2 Adversarial — Missing performanceClass (null -> Conservative HIGH +50% Loading)",
+      category: "Stage 2 Adversarial Preserved",
       inputs: { dateOfBirth: "1990-01-01", evaluationDate: "2026-11-25", claimsHistoryAvailable: true, claimDates: [], vehicleManufactureDate: "2024-01-01", vehicleType: "CAR", engineCC: 2000, performanceClass: null, coverType: "COMPREHENSIVE", insuredValue: 400000000 },
-      expected: { driverRisk: "LOW", claimsRisk: "LOW", vehicleEligibility: "ELIGIBLE", vehicleRisk: "HIGH", underwritingDecision: "ACCEPT", inspectionDecision: "NOT_REQUIRED", basePremium: 8800000, totalRiskLoading: 0.5, finalPremium: 13200000 }
+      expected: { driverRisk: "LOW", claimsRisk: "LOW", vehicleEligibility: "ELIGIBLE", vehicleRisk: "HIGH", underwritingDecision: "ACCEPT", inspectionDecision: "NOT_REQUIRED", quoteReadiness: "READY", basePremium: 8800000, totalRiskLoading: 0.5, finalPremium: 13200000 }
     },
     {
-      id: "TC-15",
-      name: "Audit Edge — Claim 1 Day Outside 24M Window (2024-11-24 only -> LOW)",
-      category: "Audit Adversarial",
+      id: "TC-24",
+      name: "Stage 2 Adversarial — Claim 1 Day Outside 24M Window (2024-11-24 only -> LOW)",
+      category: "Stage 2 Adversarial Preserved",
       inputs: { dateOfBirth: "1990-01-01", evaluationDate: "2026-11-25", claimsHistoryAvailable: true, claimDates: ["2024-11-24"], vehicleManufactureDate: "2024-01-01", vehicleType: "MOTORCYCLE", engineCC: 150, performanceClass: "STANDARD", coverType: "TPO", insuredValue: 20000000 },
-      expected: { driverRisk: "LOW", claimsRisk: "LOW", vehicleEligibility: "ELIGIBLE", vehicleRisk: "LOW", underwritingDecision: "ACCEPT", inspectionDecision: "NOT_REQUIRED", basePremium: 150000, totalRiskLoading: 0.0, finalPremium: 150000 }
+      expected: { driverRisk: "LOW", claimsRisk: "LOW", vehicleEligibility: "ELIGIBLE", vehicleRisk: "LOW", underwritingDecision: "ACCEPT", inspectionDecision: "NOT_REQUIRED", quoteReadiness: "READY", basePremium: 150000, totalRiskLoading: 0.0, finalPremium: 150000 }
     },
     {
-      id: "TC-16",
-      name: "Audit Edge — Null Item Inside claimDates + 1 Valid Claim (0 FEEL Warnings)",
-      category: "Audit Adversarial",
+      id: "TC-25",
+      name: "Stage 2 Adversarial — Null Item Inside claimDates + 1 Valid Claim (0 FEEL Warnings)",
+      category: "Stage 2 Adversarial Preserved",
       inputs: { dateOfBirth: "1990-01-01", evaluationDate: "2026-11-25", claimsHistoryAvailable: true, claimDates: ["2024-11-26", null], vehicleManufactureDate: "2024-01-01", vehicleType: "MOTORCYCLE", engineCC: 150, performanceClass: "STANDARD", coverType: "COMPREHENSIVE", insuredValue: 20000000 },
-      expected: { driverRisk: "LOW", claimsRisk: "MEDIUM", vehicleEligibility: "ELIGIBLE", vehicleRisk: "LOW", underwritingDecision: "ACCEPT", inspectionDecision: "NOT_REQUIRED", basePremium: 400000, totalRiskLoading: 0.2, finalPremium: 480000 }
+      expected: { driverRisk: "LOW", claimsRisk: "MEDIUM", vehicleEligibility: "ELIGIBLE", vehicleRisk: "LOW", underwritingDecision: "ACCEPT", inspectionDecision: "NOT_REQUIRED", quoteReadiness: "READY", basePremium: 400000, totalRiskLoading: 0.2, finalPremium: 480000 }
     },
     {
-      id: "TC-17",
-      name: "Audit Edge — Driver Age Exact Lower/Upper Bounds (Age 17 -> HIGH, Age 65 check)",
-      category: "Audit Adversarial",
+      id: "TC-26",
+      name: "Stage 2 Adversarial — Driver Age Exact Lower Bound (Age 17 -> HIGH)",
+      category: "Stage 2 Adversarial Preserved",
       inputs: { dateOfBirth: "2009-11-25", evaluationDate: "2026-11-25", claimsHistoryAvailable: true, claimDates: [], vehicleManufactureDate: "2024-01-01", vehicleType: "CAR", engineCC: 1500, performanceClass: "STANDARD", coverType: "COMPREHENSIVE", insuredValue: 200000000 },
-      expected: { driverRisk: "HIGH", claimsRisk: "LOW", vehicleEligibility: "ELIGIBLE", vehicleRisk: "LOW", underwritingDecision: "ACCEPT", inspectionDecision: "NOT_REQUIRED", basePremium: 3600000, totalRiskLoading: 0.25, finalPremium: 4500000 }
+      expected: { driverRisk: "HIGH", claimsRisk: "LOW", vehicleEligibility: "ELIGIBLE", vehicleRisk: "LOW", underwritingDecision: "ACCEPT", inspectionDecision: "NOT_REQUIRED", quoteReadiness: "READY", basePremium: 3600000, totalRiskLoading: 0.25, finalPremium: 4500000 }
     },
     {
-      id: "TC-18",
-      name: "Audit Edge — 151cc SPORT Motorcycle (R-D04-04 HIGH) + Car >2500cc TPO",
-      category: "Audit Adversarial",
+      id: "TC-27",
+      name: "Stage 2 Adversarial — 151cc SPORT Motorcycle (R-D04-04 HIGH)",
+      category: "Stage 2 Adversarial Preserved",
       inputs: { dateOfBirth: "1985-01-01", evaluationDate: "2026-11-25", claimsHistoryAvailable: true, claimDates: [], vehicleManufactureDate: "2024-01-01", vehicleType: "MOTORCYCLE", engineCC: 151, performanceClass: "SPORT", coverType: "COMPREHENSIVE", insuredValue: 60000000 },
-      expected: { driverRisk: "LOW", claimsRisk: "LOW", vehicleEligibility: "ELIGIBLE", vehicleRisk: "HIGH", underwritingDecision: "ACCEPT", inspectionDecision: "NOT_REQUIRED", basePremium: 1500000, totalRiskLoading: 0.35, finalPremium: 2025000 }
+      expected: { driverRisk: "LOW", claimsRisk: "LOW", vehicleEligibility: "ELIGIBLE", vehicleRisk: "HIGH", underwritingDecision: "ACCEPT", inspectionDecision: "NOT_REQUIRED", quoteReadiness: "READY", basePremium: 1500000, totalRiskLoading: 0.35, finalPremium: 2025000 }
     }
   ];
 
@@ -286,6 +289,7 @@ async function main() {
       vehicleRisk: ctx.vehicleRisk,
       underwritingDecision: ctx.underwritingDecision,
       inspectionDecision: ctx.inspectionDecision,
+      quoteReadiness: ctx.quoteReadiness,
       basePremium: ctx.basePremium,
       totalRiskLoading: ctx.totalRiskLoading,
       finalPremium: ctx.finalPremium,
